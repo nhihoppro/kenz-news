@@ -43,11 +43,24 @@ public class NewsWidgetProvider extends AppWidgetProvider {
         // just the ComponentName — a freshly added widget gets
         // its RemoteViews on this very call, even if the
         // ComponentName lookup lags behind.
+        // v3.37: each id is painted at its own size, so two
+        // widgets of different heights show the right number
+        // of rows each.
         try {
-            RemoteViews rv = buildViews(c);
-            for (int id : ids) awm.updateAppWidget(id, rv);
+            for (int id : ids) {
+                try { awm.updateAppWidget(id, buildViews(c, widgetHeightDp(c, id))); } catch (Exception ignored) {}
+            }
         } catch (Exception ignored) {}
         updateAll(c);
+    }
+    @Override public void onAppWidgetOptionsChanged(Context c, AppWidgetManager awm, int appWidgetId, android.os.Bundle newOptions) {
+        super.onAppWidgetOptionsChanged(c, awm, appWidgetId, newOptions);
+        // v3.37: the user resized the widget — repaint it at the
+        // new size right away so the row count + spacing follow
+        // the frame instead of waiting for the next 30-min tick.
+        try {
+            awm.updateAppWidget(appWidgetId, buildViews(c, widgetHeightDp(c, appWidgetId)));
+        } catch (Exception ignored) {}
     }
     @Override public void onEnabled(Context c) {
         updateAll(c);
@@ -60,9 +73,41 @@ public class NewsWidgetProvider extends AppWidgetProvider {
         try {
             AppWidgetManager awm = AppWidgetManager.getInstance(c);
             ComponentName cn = new ComponentName(c, NewsWidgetProvider.class);
-            if (awm.getAppWidgetIds(cn).length == 0) return;
-            awm.updateAppWidget(cn, buildViews(c));
+            int[] ids = awm.getAppWidgetIds(cn);
+            if (ids.length == 0) return;
+            // v3.37: paint each widget at its own size.
+            for (int id : ids) {
+                try { awm.updateAppWidget(id, buildViews(c, widgetHeightDp(c, id))); } catch (Exception ignored) {}
+            }
         } catch (Exception ignored) {}
+    }
+    // v3.37: the widget's real height in dp, from the options
+    // the launcher reports (max = current height in portrait).
+    // Falls back to the 170dp min when the options are absent.
+    private static int widgetHeightDp(Context c, int appWidgetId) {
+        try {
+            AppWidgetManager awm = AppWidgetManager.getInstance(c);
+            android.os.Bundle o = awm.getAppWidgetOptions(appWidgetId);
+            if (o != null) {
+                int h = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0);
+                if (h <= 0) h = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0);
+                if (h > 0) return h;
+            }
+        } catch (Exception ignored) {}
+        return 170;
+    }
+    // v3.37: how many headline rows fit in this height. Header
+    // (~30dp) + divider (~9dp) + root padding (24dp) leave the
+    // rest for rows at ~24dp each; the user's count setting is
+    // the ceiling, never the floor — a short widget shows fewer
+    // rows instead of clipping them.
+    private static int rowsForHeight(int heightDp, int userCount) {
+        int maxRows = (heightDp - 63) / 24;
+        if (maxRows < 2) maxRows = 2;
+        if (maxRows > 6) maxRows = 6;
+        int rows = Math.min(userCount, maxRows);
+        if (rows < 1) rows = 1;
+        return rows;
     }
     // v3.14: widget prefs (kenzelections). Alpha is stored as
     // an index: 0 = 60% (trong suốt, default), 1 = 80% (mờ),
@@ -103,9 +148,11 @@ public class NewsWidgetProvider extends AppWidgetProvider {
     // placeholder + spinner. Now any failure falls back to a
     // minimal card (title + "open the app" line) instead of
     // nothing, so the widget always shows content.
-    private static RemoteViews buildViews(Context c) {
+    // v3.37: the height-aware entry — the row count follows the
+    // widget's real height (see rowsForHeight).
+    private static RemoteViews buildViews(Context c, int heightDp) {
         try {
-            return buildViewsInner(c);
+            return buildViewsInner(c, rowsForHeight(heightDp, widgetCount(c)));
         } catch (Exception e) {
             try {
                 RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_news);
@@ -122,7 +169,10 @@ public class NewsWidgetProvider extends AppWidgetProvider {
             }
         }
     }
-    private static RemoteViews buildViewsInner(Context c) {
+    private static RemoteViews buildViews(Context c) {
+        return buildViews(c, 170);
+    }
+    private static RemoteViews buildViewsInner(Context c, int count) {
         RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_news);
         // v3.14: glass card — translucency + theme from prefs.
         boolean light = widgetLight(c);
@@ -135,7 +185,6 @@ public class NewsWidgetProvider extends AppWidgetProvider {
         rv.setTextColor(R.id.widgetTime, light ? 0xFF64748B : 0xFFB9C6E0);
         rv.setInt(R.id.widgetDivider, "setBackgroundColor", light ? 0xFFE2E8F0 : 0xFF334155);
         List<NewsItem> items = NewsStore.loadCache(c);
-        int count = widgetCount(c);
         int[] headIds = {R.id.widgetHead1, R.id.widgetHead2, R.id.widgetHead3, R.id.widgetHead4, R.id.widgetHead5, R.id.widgetHead6};
         int[] rowIds = {R.id.widgetRow1, R.id.widgetRow2, R.id.widgetRow3, R.id.widgetRow4, R.id.widgetRow5, R.id.widgetRow6};
         for (int i = 0; i < 6; i++) {

@@ -8,9 +8,13 @@
      app update), the launcher stayed on its white placeholder
      + spinner forever. A 30-min system tick repaints it from
      the cache on its own, so a stuck widget heals itself. -->
+<!-- v3.37: min size lowered so the widget can shrink to a
+     compact card (header + 2 rows) — the row count follows
+     the real height, so a small widget stays readable and a
+     tall one fills up instead of leaving empty glass. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="250dp"
-    android:minHeight="170dp"
+    android:minWidth="180dp"
+    android:minHeight="110dp"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_news"
     android:resizeMode="horizontal|vertical"

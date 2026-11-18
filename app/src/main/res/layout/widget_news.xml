@@ -25,7 +25,7 @@
     <View android:id="@+id/widgetDivider" android:layout_width="match_parent"
         android:layout_height="1dp" android:background="#334155"
         android:layout_marginTop="8dp" />
-    <LinearLayout android:id="@+id/widgetRow1" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:id="@+id/widgetRow1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:orientation="horizontal" android:gravity="center_vertical"
         android:paddingTop="8dp">
         <ImageView android:layout_width="6dp" android:layout_height="6dp"
@@ -36,7 +36,7 @@
             android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
-    <LinearLayout android:id="@+id/widgetRow2" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:id="@+id/widgetRow2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:orientation="horizontal" android:gravity="center_vertical"
         android:paddingTop="6dp">
         <ImageView android:layout_width="6dp" android:layout_height="6dp"
@@ -47,7 +47,7 @@
             android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
-    <LinearLayout android:id="@+id/widgetRow3" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:id="@+id/widgetRow3" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:orientation="horizontal" android:gravity="center_vertical"
         android:paddingTop="6dp">
         <ImageView android:layout_width="6dp" android:layout_height="6dp"
@@ -58,7 +58,7 @@
             android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
-    <LinearLayout android:id="@+id/widgetRow4" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:id="@+id/widgetRow4" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:orientation="horizontal" android:gravity="center_vertical"
         android:paddingTop="6dp">
         <ImageView android:layout_width="6dp" android:layout_height="6dp"
@@ -71,7 +71,7 @@
     </LinearLayout>
     <!-- v3.14: rows 5-6, shown only when the widget count
          setting is 6 (see NewsWidgetProvider.buildViews). -->
-    <LinearLayout android:id="@+id/widgetRow5" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:id="@+id/widgetRow5" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:orientation="horizontal" android:gravity="center_vertical"
         android:paddingTop="6dp" android:visibility="gone">
         <ImageView android:layout_width="6dp" android:layout_height="6dp"
@@ -82,7 +82,7 @@
             android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
-    <LinearLayout android:id="@+id/widgetRow6" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:id="@+id/widgetRow6" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:orientation="horizontal" android:gravity="center_vertical"
         android:paddingTop="6dp" android:visibility="gone">
         <ImageView android:layout_width="6dp" android:layout_height="6dp"
