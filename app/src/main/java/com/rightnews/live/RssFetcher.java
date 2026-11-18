@@ -103,7 +103,7 @@ public class RssFetcher {
         // case: all 9 channel feeds failed at once while news
         // feeds still worked). Other feeds keep the Kenz UA
         // that already works for them.
-        conn.setRequestProperty("User-Agent", (url.contains("apnews.com") || url.contains("youtube.com")) ? TranslateUtil.chromeUa() : "KenzNews/0.0.2-nightly (Android RSS reader)");
+        conn.setRequestProperty("User-Agent", (url.contains("apnews.com") || url.contains("youtube.com")) ? TranslateUtil.chromeUa() : "KenzNews/0.0.3-nightly (Android RSS reader)");
         conn.setInstanceFollowRedirects(true);
         InputStream in = conn.getInputStream();
         try { return parse(in, name, category); } finally { try { in.close(); } catch (Exception ignored) {} }

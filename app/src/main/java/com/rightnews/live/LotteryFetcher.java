@@ -167,6 +167,17 @@ public class LotteryFetcher {
         int start = DRAW_START_MIN[region];
         return mins >= start && mins <= start + 50;
     }
+    // v3.36: the live window for the rolling view — from 15
+    // min before the draw until ~50 min after (the same
+    // window the 10s poll uses). The prize cells start
+    // rolling at the window open (16:00 for MN), not at the
+    // draw start, so the board is already "running" when the
+    // first number lands.
+    public static boolean isLiveWindow(int region, Calendar now) {
+        int mins = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+        int start = DRAW_START_MIN[region];
+        return mins >= start - 15 && mins <= start + 50;
+    }
     // v3.7: before today's draw, the tab shows TODAY's
     // stations (per the weekday schedule), each with its
     // latest previous draw — the last time THAT station drew
@@ -195,6 +206,30 @@ public class LotteryFetcher {
         for (String code : codes) {
             Draw d = found.get(code);
             if (d != null) out.add(d);
+        }
+        return out;
+    }
+    // v3.36: empty draws for the stations scheduled on
+    // `date` — one Draw per station, every canonical prize
+    // present but with no numbers yet. Used for the live
+    // rolling view before the first numbers land (the source
+    // omits undrawn prizes entirely, so without this the
+    // card would have no rows to roll).
+    public static List<Draw> emptyDraws(int region, Calendar date) {
+        List<Draw> out = new ArrayList<>();
+        String[] prizes = region == MB ? PRIZES_MB : PRIZES_MN_MT;
+        for (String code : todayCodes(region, date)) {
+            Draw d = new Draw();
+            d.provinceCode = code;
+            if (region == MB) d.province = mbIssuer(date);
+            else d.province = PROVINCE_NAMES.get(code);
+            d.date = (Calendar) date.clone();
+            for (String lab : prizes) {
+                PrizeRow r = new PrizeRow();
+                r.label = lab;
+                d.prizes.add(r);
+            }
+            out.add(d);
         }
         return out;
     }
@@ -479,40 +514,29 @@ public class LotteryFetcher {
         return 1; // Giải ĐB
     }
     public static class RollingPrize { public String label; public int digits; }
-    public static RollingPrize rollingPrize(Draw d, int region) {
-        if (d == null || d.prizes == null || d.prizes.isEmpty()) return null;
-        // The prize being drawn: the smallest-rank prize that
-        // is empty or still short of its full count.
-        String bestLabel = null;
-        int bestRank = Integer.MAX_VALUE;
-        for (PrizeRow r : d.prizes) {
-            int have = r.numbers == null ? 0 : r.numbers.size();
-            if (have < prizeCount(region, r.label)) {
-                int rk = prizeRank(r.label);
-                if (rk < bestRank) { bestRank = rk; bestLabel = r.label; }
-            }
-        }
-        if (bestLabel != null) {
-            RollingPrize rp = new RollingPrize();
-            rp.label = bestLabel;
-            rp.digits = prizeDigits(region, bestLabel);
-            return rp;
-        }
-        // No empty/partial row — the smallest canonical prize
-        // not present in the draw at all (the source page
-        // omits undrawn prizes entirely).
+    // v3.36: every prize that should roll right now — empty,
+    // incomplete, or absent from the draw entirely (the
+    // source omits undrawn prizes). One RollingPrize per
+    // prize, in canonical (smallest-first) order. Replaces
+    // the old single-prize rollingPrize: now all undrawn
+    // cells roll at once, and each locks in when its numbers
+    // land.
+    public static List<RollingPrize> rollingPrizes(Draw d, int region) {
+        List<RollingPrize> out = new ArrayList<>();
         String[] all = region == MB ? PRIZES_MB : PRIZES_MN_MT;
         for (String lab : all) {
-            boolean present = false;
-            for (PrizeRow r : d.prizes) if (lab.equals(r.label)) { present = true; break; }
-            if (!present) {
+            PrizeRow row = null;
+            if (d != null && d.prizes != null)
+                for (PrizeRow r : d.prizes) if (lab.equals(r.label)) { row = r; break; }
+            int have = row == null || row.numbers == null ? 0 : row.numbers.size();
+            if (have < prizeCount(region, lab)) {
                 RollingPrize rp = new RollingPrize();
                 rp.label = lab;
                 rp.digits = prizeDigits(region, lab);
-                return rp;
+                out.add(rp);
             }
         }
-        return null;
+        return out;
     }
     private static void sortPrizesAscending(Draw d) {
         // Stable insertion sort (tiny list, no extra imports):

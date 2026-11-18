@@ -96,19 +96,24 @@ public class MainActivity extends Activity {
     private int livePollNewCount = 0;
     // v3.32: live "rolling numbers" — while a prize is being
     // drawn, its numbers slot cycles random digits (90ms)
-    // until the real result lands on the next poll. Only one
-    // prize rolls at a time: the smallest-rank prize still
-    // being drawn. rollingBase is the numbers already drawn
-    // for that prize ("" when none yet) — the ticker appends
-    // the rolling digits after them.
+    // until the real result lands on the next poll. v3.36:
+    // EVERY prize still undrawn rolls at once (not just the
+    // smallest-rank one) — one entry per rolling row: its
+    // numbers TextView, the numbers already drawn for that
+    // prize ("" when none yet), and how many random digits
+    // to append after them.
+    private static class RollingRow {
+        final TextView view;
+        final CharSequence base;
+        final int digits;
+        RollingRow(TextView v, CharSequence b, int d) { view = v; base = b; digits = d; }
+    }
     private final Handler rollHandler = new Handler(Looper.getMainLooper());
-    private TextView rollingNumsView = null;
-    private CharSequence rollingBase = "";
-    private int rollingDigits = 0;
+    private final List<RollingRow> rollingRows = new ArrayList<>();
     private final Runnable rollRunnable = new Runnable() {
         public void run() {
-            if (rollingNumsView == null) return;
-            rollingNumsView.setText(rollingText(rollingBase, rollingDigits));
+            if (rollingRows.isEmpty()) return;
+            for (RollingRow rr : rollingRows) rr.view.setText(rollingText(rr.base, rr.digits));
             rollHandler.postDelayed(this, 90);
         }
     };
@@ -119,18 +124,16 @@ public class MainActivity extends Activity {
         return sb;
     }
     private void startRolling() {
-        if (rollingNumsView == null) return;
+        if (rollingRows.isEmpty()) return;
         rollHandler.removeCallbacks(rollRunnable);
         rollHandler.post(rollRunnable);
     }
     private void stopRolling() {
         rollHandler.removeCallbacks(rollRunnable);
-        rollingNumsView = null;
-        rollingBase = "";
-        rollingDigits = 0;
+        rollingRows.clear();
     }
     private void maybeStartRolling() {
-        if (tab == 2 && rollingNumsView != null) startRolling();
+        if (tab == 2 && !rollingRows.isEmpty()) startRolling();
     }
     // v3.12: the draws currently shown on the lottery tab
     // (the dò vé số check runs against these).
@@ -1796,18 +1799,27 @@ public class MainActivity extends Activity {
                 // v3.31: live per-number reveal — diff against
                 // the previous cached result for this same
                 // region+date; numbers present now but absent
-                // before just landed. Only when the previous
-                // result already held today's draws; a first
-                // load, or a load replacing previous-draw
-                // placeholders, marks nothing as new.
+                // before just landed.
+                // v3.36: the first numbers of the day also
+                // count as "just landed" — before them,
+                // prev.draws was empty (the tab showed the
+                // previous draw / the rolling board), so the
+                // old !prev.draws.isEmpty() guard swallowed
+                // the whole first batch. Only while the draw
+                // is live; opening a finished result must not
+                // highlight the whole table.
                 final Set<String> arrived = new HashSet<>();
                 LotteryFetcher.DayResult prev = lotteryCache.get(key);
-                if (prev != null && !prev.draws.isEmpty() && !res.draws.isEmpty()) {
-                    Set<String> before = new HashSet<>();
-                    collectDrawKeys(prev.draws, before);
-                    Set<String> nowKeys = new HashSet<>();
-                    collectDrawKeys(res.draws, nowKeys);
-                    for (String k : nowKeys) if (!before.contains(k)) arrived.add(k);
+                if (prev != null && !res.draws.isEmpty()) {
+                    boolean liveNow = LotteryFetcher.isLiveWindow(region, Calendar.getInstance())
+                            && LotteryFetcher.sameDay(date, Calendar.getInstance());
+                    if (liveNow) {
+                        Set<String> before = new HashSet<>();
+                        collectDrawKeys(prev.draws, before);
+                        Set<String> nowKeys = new HashSet<>();
+                        collectDrawKeys(res.draws, nowKeys);
+                        for (String k : nowKeys) if (!before.contains(k)) arrived.add(k);
+                    }
                 }
                 // v3.7: before today's draw, the tab shows
                 // TODAY's stations with their latest previous
@@ -1862,11 +1874,24 @@ public class MainActivity extends Activity {
             if (ss != null) ss.setVisibility(View.GONE);
             return;
         }
+        // v3.36: inside the live window (from 15 min before
+        // the draw) the board is already rolling even though
+        // no number has landed yet — say so instead of the
+        // "kỳ trước" line (the card no longer shows it).
+        boolean liveWindow = LotteryFetcher.isLiveWindow(res.region, Calendar.getInstance())
+                && LotteryFetcher.sameDay(res.date, Calendar.getInstance());
         if (!res.drawDone) {
-            int start = LotteryFetcher.DRAW_START_MIN[res.region];
-            setLotteryStatus("Chưa tới giờ quay (" + (start / 60) + "h"
-                    + String.format(Locale.US, "%02d", start % 60)
-                    + ") — kết quả kỳ trước của các đài quay hôm nay.");
+            if (liveWindow) {
+                int start = LotteryFetcher.DRAW_START_MIN[res.region];
+                setLotteryStatus("Đang chạy xổ — chờ giờ quay " + (start / 60) + "h"
+                        + String.format(Locale.US, "%02d", start % 60)
+                        + ", số về sẽ hiện lên • Nguồn: Minh Ngọc");
+            } else {
+                int start = LotteryFetcher.DRAW_START_MIN[res.region];
+                setLotteryStatus("Chưa tới giờ quay (" + (start / 60) + "h"
+                        + String.format(Locale.US, "%02d", start % 60)
+                        + ") — kết quả kỳ trước của các đài quay hôm nay.");
+            }
         } else if (fresh) {
             // v3.5: red live mark while this region is drawing.
             boolean live = LotteryFetcher.isLiveNow(res.region, Calendar.getInstance())
@@ -1890,10 +1915,22 @@ public class MainActivity extends Activity {
         // v3.7: before the draw, show today's stations with
         // their previous draw (previousDraws); fall back to
         // the latest draws if no previous draw was found.
-        List<LotteryFetcher.Draw> show = res.draws.isEmpty()
-                ? (!res.previousDraws.isEmpty() ? res.previousDraws : res.latestDraws)
-                : res.draws;
-        boolean showingPrevious = res.draws.isEmpty() && (!res.previousDraws.isEmpty() || !res.latestDraws.isEmpty());
+        // v3.36: inside the live window an empty today means
+        // the draw hasn't produced a number yet — show
+        // today's stations with every prize cell rolling,
+        // not last week's numbers.
+        List<LotteryFetcher.Draw> show;
+        boolean showingPrevious;
+        if (res.draws.isEmpty() && liveWindow) {
+            show = LotteryFetcher.emptyDraws(res.region, res.date);
+            showingPrevious = false;
+        } else if (res.draws.isEmpty()) {
+            show = !res.previousDraws.isEmpty() ? res.previousDraws : res.latestDraws;
+            showingPrevious = !show.isEmpty();
+        } else {
+            show = res.draws;
+            showingPrevious = false;
+        }
         currentLotteryDraws = new ArrayList<>(show);
         // v3.20: station sub-tabs (see renderLotteryStations) —
         // one tab per station; only the selected station's card
@@ -2031,15 +2068,21 @@ public class MainActivity extends Activity {
             note.setGravity(Gravity.CENTER); // v3.32: centred layout.
             card.addView(note);
         }
-        // v3.32: live rolling — which prize is being drawn
-        // right now (null when the draw is done or not live).
+        // v3.36: live rolling — every prize still undrawn
+        // rolls at once (not just the smallest-rank one).
+        // liveDraw is true inside the live window (from 15
+        // min before the draw), so the cells start rolling at
+        // 16:00 for MN, before the first number lands. A
+        // prize locks in (stops rolling) when its numbers
+        // arrive on a poll.
         boolean liveDraw = !showingPrevious
-                && LotteryFetcher.isLiveNow(region, Calendar.getInstance())
+                && LotteryFetcher.isLiveWindow(region, Calendar.getInstance())
                 && draw.date != null && LotteryFetcher.sameDay(draw.date, Calendar.getInstance());
-        LotteryFetcher.RollingPrize rp = liveDraw ? LotteryFetcher.rollingPrize(draw, region) : null;
-        boolean rpPresent = false;
-        if (rp != null) for (LotteryFetcher.PrizeRow row : draw.prizes)
-            if (rp.label.equals(row.label)) { rpPresent = true; break; }
+        List<LotteryFetcher.RollingPrize> rolling = liveDraw
+                ? LotteryFetcher.rollingPrizes(draw, region)
+                : new ArrayList<LotteryFetcher.RollingPrize>();
+        Map<String, Integer> rollingDigitsByLabel = new HashMap<>();
+        for (LotteryFetcher.RollingPrize rp : rolling) rollingDigitsByLabel.put(rp.label, rp.digits);
         int firstPrizeIdx = card.getChildCount();
         for (LotteryFetcher.PrizeRow row : draw.prizes) {
             boolean special = "Giải ĐB".equals(row.label);
@@ -2052,25 +2095,31 @@ public class MainActivity extends Activity {
             CharSequence numsText = spannedNumbers(draw.date != null ? LotteryFetcher.dateKey(draw.date) : "",
                     draw.provinceCode, row.label, row.numbers, special);
             LinearLayout r = buildPrizeRowView(row.label, numsText, special);
-            if (rp != null && rp.label.equals(row.label)) {
-                rollingNumsView = (TextView) r.getChildAt(1);
-                rollingDigits = rp.digits;
-                rollingBase = (row.numbers == null || row.numbers.isEmpty()) ? "" : numsText;
-                rollingNumsView.setText(rollingText(rollingBase, rollingDigits));
+            Integer rd = rollingDigitsByLabel.get(row.label);
+            if (rd != null) {
+                // Still being drawn: keep the numbers already
+                // drawn as the base and roll the next one.
+                TextView nv = (TextView) r.getChildAt(1);
+                CharSequence base = (row.numbers == null || row.numbers.isEmpty()) ? "" : numsText;
+                rollingRows.add(new RollingRow(nv, base, rd));
+                nv.setText(rollingText(base, rd));
             }
             card.addView(r);
         }
-        // v3.32: the prize being drawn is not on the page yet
-        // (the source omits undrawn prizes) — add its rolling
-        // row: at the end for MN/MT (ascending), before the
-        // first prize row for MB (biggest-first).
-        if (rp != null && !rpPresent) {
+        // v3.36: every canonical prize missing from the draw
+        // gets its own rolling row (the source omits undrawn
+        // prizes). MN/MT append in ascending order; MB inserts
+        // at firstPrizeIdx in canonical order, which lands
+        // biggest-first on screen.
+        for (LotteryFetcher.RollingPrize rp : rolling) {
+            boolean present = false;
+            for (LotteryFetcher.PrizeRow row : draw.prizes) if (rp.label.equals(row.label)) { present = true; break; }
+            if (present) continue;
             boolean special = "Giải ĐB".equals(rp.label);
             LinearLayout rr = buildPrizeRowView(rp.label, "", special);
-            rollingNumsView = (TextView) rr.getChildAt(1);
-            rollingDigits = rp.digits;
-            rollingBase = "";
-            rollingNumsView.setText(rollingText("", rollingDigits));
+            TextView nv = (TextView) rr.getChildAt(1);
+            rollingRows.add(new RollingRow(nv, "", rp.digits));
+            nv.setText(rollingText("", rp.digits));
             if (region == LotteryFetcher.MB) card.addView(rr, firstPrizeIdx);
             else card.addView(rr);
         }
