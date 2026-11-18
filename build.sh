@@ -11,13 +11,13 @@ ZIPALIGN=$ANDROID_HOME/build-tools/36.0.0/zipalign
 APKSIGNER=$ANDROID_HOME/build-tools/36.0.0/apksigner
 SRC=~/workspace/rightnews-live/app/src/main
 WORK=~/workspace/.tmp/rightnews-build/work
-OUT=~/workspace/your_files/rightnews-live/KenzNewsv0-0-1-nightly.apk
+OUT=~/workspace/your_files/rightnews-live/KenzNewsv0-0-2-nightly.apk
 rm -rf "$WORK" && mkdir -p "$WORK/compiled" "$WORK/classes" "$WORK/dex" "$WORK/gen"
 "$AAPT" compile --dir "$SRC/res" -o "$WORK/compiled/res.zip"
 "$AAPT" link -o "$WORK/base.apk" \
     -I "$PLATFORM" \
     --min-sdk-version 26 --target-sdk-version 35 \
-    --version-code 89 --version-name "0.0.1-nightly" \
+    --version-code 93 --version-name "0.0.2-nightly" \
     --manifest "$SRC/AndroidManifest.xml" \
     --java "$WORK/gen" \
     "$WORK/compiled/res.zip"

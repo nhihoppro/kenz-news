@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- Nightly: stats icon — 3 ascending bars (3 miền) in the
+         app's stroked icon language (white strokes, tinted to
+         the theme in code), same as ic_tab_lottery / ic_calendar. -->
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="1.8"
+        android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M4,21 V16 Q4,15 5,15 H7 Q8,15 8,16 V21 Z M10,21 V12 Q10,11 11,11 H13 Q14,11 14,12 V21 Z M16,21 V8 Q16,7 17,7 H19 Q20,7 20,8 V21 Z" />
+</vector>

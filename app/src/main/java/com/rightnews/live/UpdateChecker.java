@@ -142,12 +142,20 @@ public class UpdateChecker {
         DownloadManager.Request req = new DownloadManager.Request(Uri.parse(info.apkUrl));
         req.setTitle("Kenz News " + info.versionName);
         req.setDescription("Đang tải bản cập nhật");
-        req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
+        // VISIBILITY_HIDDEN needs DOWNLOAD_WITHOUT_NOTIFICATION,
+        // a signature|privileged permission a normal app can never
+        // hold — enqueue() threw SecurityException and the
+        // download never started ("Không bắt đầu tải được",
+        // reported 2026-11-18). A normal app must use a visible
+        // notification; the in-app progress dialog still shows
+        // the live % + MB, so the system one only appears when
+        // the download finishes.
+        req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         req.setAllowedOverMetered(true);
         req.setAllowedOverRoaming(true);
         req.setDestinationInExternalFilesDir(act, Environment.DIRECTORY_DOWNLOADS, APK_FILE);
         long id;
-        try { id = dm.enqueue(req); } catch (Exception e) { toast(act, "Không bắt đầu tải được"); return; }
+        try { id = dm.enqueue(req); } catch (Exception e) { android.util.Log.e("KenzNewsOTA", "enqueue failed", e); toast(act, "Không bắt đầu tải được"); return; }
         p.edit().putLong("ota_pending_download", id).putInt("ota_pending_vc", info.versionCode).apply();
         showProgress(act, dm, id, info);
     }

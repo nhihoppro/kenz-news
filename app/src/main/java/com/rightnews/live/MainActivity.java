@@ -989,6 +989,14 @@ public class MainActivity extends Activity {
         if (edLot != null) { edLot.setTextColor(Theme.bodyText(this)); edLot.setHintTextColor(Theme.noteText(this)); }
         TextView btnLotCheck = findViewById(R.id.btnLotCheck);
         if (btnLotCheck != null) { btnLotCheck.setBackground(Theme.pillDrawable(this)); btnLotCheck.setTextColor(Theme.pillText(this)); }
+        // Nightly: the stats button is a row (icon + label) now —
+        // tint the icon and colour the label so both stay readable
+        // in dark mode. The row itself centres icon + label as
+        // one unit (see the layout note).
+        TextView txtLotStats = findViewById(R.id.txtLotStats);
+        if (txtLotStats != null) txtLotStats.setTextColor(Theme.bodyText(this));
+        ImageView imgLotStats = findViewById(R.id.imgLotStats);
+        if (imgLotStats != null) imgLotStats.setColorFilter(Theme.bodyText(this));
         styleLotteryChips();
         if (bottomBlur != null) bottomBlur.invalidate();
         if (topBlur != null) topBlur.invalidate();
@@ -1501,12 +1509,13 @@ public class MainActivity extends Activity {
     // nhiều nhất. The fetch runs off the UI thread; the dialog
     // shows a loading state until the numbers land.
     private void showLotteryStats() {
-        final android.app.AlertDialog progress = new android.app.AlertDialog.Builder(this)
+        final android.app.AlertDialog progress = new android.app.AlertDialog.Builder(this, Theme.dialogTheme(this))
                 .setTitle("Thống kê 30 ngày")
                 .setMessage("Đang tải kết quả 30 ngày của " + LotteryFetcher.REGION_NAMES[lotteryRegion] + "…")
                 .setCancelable(false)
                 .create();
         progress.show();
+        Theme.styleDialog(progress, this);
         final int region = lotteryRegion;
         LotteryStats.compute(region, 30, new LotteryStats.Cb() {
             public void onDone(final LotteryStats.Result r) {
@@ -1517,69 +1526,138 @@ public class MainActivity extends Activity {
                             Toast.makeText(MainActivity.this, "Không tải được kết quả để thống kê — kiểm tra mạng rồi thử lại.", Toast.LENGTH_LONG).show();
                             return;
                         }
-                        TextView tv = new TextView(MainActivity.this);
-                        tv.setText(buildLotteryStatsText(r));
-                        tv.setTextSize(14);
-                        tv.setTextColor(Theme.bodyText(MainActivity.this));
-                        tv.setPadding(24, 16, 24, 16);
                         android.widget.ScrollView sv = new android.widget.ScrollView(MainActivity.this);
-                        sv.addView(tv);
-                        new android.app.AlertDialog.Builder(MainActivity.this)
+                        sv.addView(buildLotteryStatsView(r));
+                        android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(MainActivity.this, Theme.dialogTheme(MainActivity.this))
                                 .setTitle("Thống kê 30 ngày — " + LotteryFetcher.REGION_NAMES[region])
                                 .setView(sv)
                                 .setPositiveButton("Đóng", null)
-                                .show();
+                                .create();
+                        dlg.show();
+                        Theme.styleDialog(dlg, MainActivity.this);
                     }
                 });
             }
         });
     }
 
-    private String buildLotteryStatsText(LotteryStats.Result r) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(r.daysCounted).append(" kỳ có kết quả trong 30 ngày gần nhất.\n");
-        // Most frequent 2-digit endings, top 10.
+    // Nightly: the stats dialog, rebuilt in the app's design
+    // language — theme dialog (rounded window + pill buttons),
+    // section headers in the header colour, one row per number
+    // with a proportional bar (navy/white for frequency, red
+    // for lô gan). Replaces the plain-text dialog, a stock
+    // white AlertDialog that clashed with the app's glass look.
+    private android.view.View buildLotteryStatsView(LotteryStats.Result r) {
+        float d = getResources().getDisplayMetrics().density;
+        LinearLayout lay = new LinearLayout(this);
+        lay.setOrientation(LinearLayout.VERTICAL);
+        lay.setPadding((int) (20 * d), (int) (8 * d), (int) (20 * d), (int) (16 * d));
+        TextView sub = new TextView(this);
+        sub.setText(r.daysCounted + " kỳ có kết quả trong 30 ngày gần nhất.");
+        sub.setTextSize(13);
+        sub.setTextColor(Theme.noteText(this));
+        sub.setPadding(0, 0, 0, (int) (4 * d));
+        lay.addView(sub);
+        // Most frequent, top 10.
         List<Map.Entry<String, Integer>> freq = new ArrayList<>(r.freq.entrySet());
         Collections.sort(freq, new Comparator<Map.Entry<String, Integer>>() {
             public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
-                int d = b.getValue() - a.getValue();
-                return d != 0 ? d : a.getKey().compareTo(b.getKey());
+                int dd = b.getValue() - a.getValue();
+                return dd != 0 ? dd : a.getKey().compareTo(b.getKey());
             }
         });
-        sb.append("\nVề nhiều nhất:\n");
+        lay.addView(statSection("Về nhiều nhất"));
+        int maxF = freq.isEmpty() ? 1 : freq.get(0).getValue();
         for (int i = 0; i < Math.min(10, freq.size()); i++)
-            sb.append(freq.get(i).getKey()).append(" — ").append(freq.get(i).getValue()).append(" lần\n");
-        // Longest absent ("lô gan"), top 10.
+            lay.addView(statRow(freq.get(i).getKey(), freq.get(i).getValue() + " lần",
+                    (float) freq.get(i).getValue() / maxF, Theme.headerText(this)));
+        // Lô gan, top 10.
         List<Map.Entry<String, Integer>> gan = new ArrayList<>(r.lastSeenDaysAgo.entrySet());
         Collections.sort(gan, new Comparator<Map.Entry<String, Integer>>() {
             public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
-                int d = b.getValue() - a.getValue();
-                return d != 0 ? d : a.getKey().compareTo(b.getKey());
+                int dd = b.getValue() - a.getValue();
+                return dd != 0 ? dd : a.getKey().compareTo(b.getKey());
             }
         });
-        sb.append("\nLâu chưa về (lô gan):\n");
+        lay.addView(statSection("Lâu chưa về (lô gan)"));
+        int maxG = gan.isEmpty() ? 1 : gan.get(0).getValue();
         for (int i = 0; i < Math.min(10, gan.size()); i++) {
-            int d = gan.get(i).getValue();
-            sb.append(gan.get(i).getKey()).append(" — ");
-            sb.append(d >= r.daysRequested ? "chưa về trong 30 ngày" : d + (d == 1 ? " ngày" : " ngày"));
-            sb.append("\n");
+            int dd = gan.get(i).getValue();
+            String v = dd >= r.daysRequested ? "chưa về 30 ngày" : dd + " ngày";
+            lay.addView(statRow(gan.get(i).getKey(), v, (float) dd / Math.max(maxG, 1), 0xFFDC2626));
         }
-        // Head / tail frequency, top 5 each.
-        sb.append("\nĐầu về nhiều nhất:\n");
-        appendTopDigits(sb, r.headFreq, 5);
-        sb.append("\nĐuôi về nhiều nhất:\n");
-        appendTopDigits(sb, r.tailFreq, 5);
-        return sb.toString();
+        // Head / tail, top 5 each.
+        lay.addView(statSection("Đầu về nhiều nhất"));
+        addTopDigits(lay, r.headFreq, 5);
+        lay.addView(statSection("Đuôi về nhiều nhất"));
+        addTopDigits(lay, r.tailFreq, 5);
+        return lay;
     }
 
-    private void appendTopDigits(StringBuilder sb, int[] counts, int top) {
+    private TextView statSection(String title) {
+        float d = getResources().getDisplayMetrics().density;
+        TextView t = new TextView(this);
+        t.setText(title);
+        t.setTextSize(15);
+        t.setTypeface(null, Typeface.BOLD);
+        t.setTextColor(Theme.headerText(this));
+        t.setPadding(0, (int) (16 * d), 0, (int) (4 * d));
+        return t;
+    }
+
+    private void addTopDigits(LinearLayout lay, int[] counts, int top) {
         List<Integer> idx = new ArrayList<>();
         for (int i = 0; i < counts.length; i++) idx.add(i);
         Collections.sort(idx, new Comparator<Integer>() {
             public int compare(Integer a, Integer b) { return counts[b] - counts[a]; }
         });
+        int max = idx.isEmpty() ? 1 : counts[idx.get(0)];
         for (int i = 0; i < Math.min(top, idx.size()); i++)
-            sb.append(idx.get(i)).append(" — ").append(counts[idx.get(i)]).append(" lần\n");
+            lay.addView(statRow(String.valueOf(idx.get(i)), counts[idx.get(i)] + " lần",
+                    (float) counts[idx.get(i)] / Math.max(max, 1), Theme.headerText(this)));
+    }
+
+    // One stat row: bold number | proportional bar | count.
+    // The bar is a rounded track with a fill whose width is
+    // the value's share of the section max.
+    private LinearLayout statRow(String label, String value, float fraction, int barColor) {
+        float d = getResources().getDisplayMetrics().density;
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(0, (int) (5 * d), 0, (int) (5 * d));
+        TextView num = new TextView(this);
+        num.setText(label);
+        num.setTextSize(16);
+        num.setTypeface(null, Typeface.BOLD);
+        num.setTextColor(Theme.bodyText(this));
+        num.setMinWidth((int) (40 * d));
+        row.addView(num);
+        LinearLayout track = new LinearLayout(this);
+        track.setOrientation(LinearLayout.HORIZONTAL);
+        GradientDrawable trackBg = new GradientDrawable();
+        trackBg.setColor(Theme.isLight(this) ? 0x140A1B4A : 0x33FFFFFF);
+        trackBg.setCornerRadius(4 * d);
+        track.setBackground(trackBg);
+        LinearLayout.LayoutParams trackLp = new LinearLayout.LayoutParams(0, (int) (8 * d), 1f);
+        trackLp.setMargins((int) (10 * d), 0, (int) (10 * d), 0);
+        View fill = new View(this);
+        GradientDrawable fillBg = new GradientDrawable();
+        fillBg.setColor(barColor);
+        fillBg.setCornerRadius(4 * d);
+        fill.setBackground(fillBg);
+        float f = Math.max(0.05f, Math.min(1f, fraction));
+        track.addView(fill, new LinearLayout.LayoutParams(0, (int) (8 * d), f));
+        track.addView(new View(this), new LinearLayout.LayoutParams(0, (int) (8 * d), Math.max(1f - f, 0.02f)));
+        row.addView(track, trackLp);
+        TextView val = new TextView(this);
+        val.setText(value);
+        val.setTextSize(13);
+        val.setTextColor(Theme.subText(this));
+        val.setGravity(Gravity.END);
+        val.setMinWidth((int) (52 * d));
+        row.addView(val);
+        return row;
     }
 
     private Calendar midnightToday() {
