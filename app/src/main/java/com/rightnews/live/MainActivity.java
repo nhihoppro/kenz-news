@@ -1438,8 +1438,11 @@ public class MainActivity extends Activity {
 
     // Nightly: clear the whole reading history (with confirm —
     // it also undims the read articles in the news list).
+    // v3.36: this dialog was one of the two that skipped
+    // dialogTheme/styleDialog (plain system look, buttons
+    // packed close) — now it matches every other dialog.
     private void clearHistoryConfirm() {
-        new android.app.AlertDialog.Builder(this)
+        android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(this, Theme.dialogTheme(this))
                 .setTitle("Xoá lịch sử đã đọc?")
                 .setMessage("Toàn bộ lịch sử đã đọc sẽ bị xoá, và các bài đã đọc sẽ hiện lại bình thường (không mờ nữa).")
                 .setPositiveButton("Xoá", new android.content.DialogInterface.OnClickListener() {
@@ -1451,7 +1454,9 @@ public class MainActivity extends Activity {
                     }
                 })
                 .setNegativeButton("Huỷ", null)
-                .show();
+                .create();
+        dlg.show();
+        Theme.styleDialog(dlg, this);
     }
     private void saveItem(NewsItem it) {
         if (it == null) return;

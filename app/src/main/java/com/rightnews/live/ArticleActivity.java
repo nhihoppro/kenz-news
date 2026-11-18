@@ -230,14 +230,21 @@ public class ArticleActivity extends Activity {
                                 speaking = false;
                                 ((TextView) findViewById(R.id.txtArticleStatus)).setText(msg);
                                 if (voiceMissing) {
-                                    new android.app.AlertDialog.Builder(ArticleActivity.this)
+                                    // v3.36: this dialog was the other
+                                    // one that skipped dialogTheme /
+                                    // styleDialog (plain system look,
+                                    // buttons packed close) — now it
+                                    // matches every other dialog.
+                                    android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(ArticleActivity.this, Theme.dialogTheme(ArticleActivity.this))
                                             .setTitle("Chưa có giọng đọc")
                                             .setMessage(msg + "\n\nMở Cài đặt giọng nói của máy để tải giọng tiếng Việt (miễn phí) rồi nghe lại.")
                                             .setPositiveButton("Mở cài đặt", new android.content.DialogInterface.OnClickListener() {
                                                 public void onClick(android.content.DialogInterface d, int which) { ArticleSpeaker.openTtsSettings(ArticleActivity.this); }
                                             })
                                             .setNegativeButton("Để sau", null)
-                                            .show();
+                                            .create();
+                                    dlg.show();
+                                    Theme.styleDialog(dlg, ArticleActivity.this);
                                 } else {
                                     Toast.makeText(ArticleActivity.this, msg, Toast.LENGTH_LONG).show();
                                 }
