@@ -11,6 +11,7 @@ public class SettingsActivity extends Activity {
     private TextView txtTitles, txtGlass, txtNotify, txtTheme, txtBgPlay, txtPip, txtPerms, txtSourcesState, txtAutoplayState, txtViewModeState, txtFontSizeState, txtLotteryNotify, txtLotteryRegions;
     private TextView txtKeywordsState, txtAudioOnlyState, txtBackupState, txtRestoreState;
     private TextView txtWidgetAlphaState, txtWidgetCountState, txtWidgetThemeState;
+    private TextView txtOtaState, txtOtaCheckState;
     private android.widget.LinearLayout sourcesListBox;
     private TextView txtSourcesHint, txtSourcesNote;
     private java.util.List<Source> sources;
@@ -71,6 +72,8 @@ public class SettingsActivity extends Activity {
         txtWidgetAlphaState = findViewById(R.id.txtWidgetAlphaState);
         txtWidgetCountState = findViewById(R.id.txtWidgetCountState);
         txtWidgetThemeState = findViewById(R.id.txtWidgetThemeState);
+        txtOtaState = findViewById(R.id.txtOtaState);
+        txtOtaCheckState = findViewById(R.id.txtOtaCheckState);
         sourcesListBox = findViewById(R.id.sourcesListBox);
         txtSourcesHint = findViewById(R.id.txtSourcesHint);
         txtSourcesNote = findViewById(R.id.txtSourcesNote);
@@ -227,6 +230,21 @@ public class SettingsActivity extends Activity {
                 Theme.styleDialog(_dlg, SettingsActivity.this);
             }
         });
+        // Nightly OTA: toggle auto-check on launch + manual check now.
+        findViewById(R.id.rowOta).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                boolean now = !UpdateChecker.otaEnabled(SettingsActivity.this);
+                UpdateChecker.setOtaEnabled(SettingsActivity.this, now);
+                refresh();
+                Toast.makeText(SettingsActivity.this, now ? "Đã bật tự kiểm tra cập nhật" : "Đã tắt tự kiểm tra cập nhật", Toast.LENGTH_SHORT).show();
+            }
+        });
+        findViewById(R.id.rowOtaCheck).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(SettingsActivity.this, "Đang kiểm tra cập nhật…", Toast.LENGTH_SHORT).show();
+                UpdateChecker.checkNow(SettingsActivity.this);
+            }
+        });
         refresh();
         applyTheme();
         applySettingsOrientation();
@@ -290,7 +308,7 @@ public class SettingsActivity extends Activity {
         TextView back = findViewById(R.id.btnSettingsBack);
         // v1.13: back button plain on the bar, like the main header.
         if (back != null) { back.setBackgroundColor(0x00000000); back.setTextColor(Theme.headerText(this)); }
-        int[] rows = {R.id.rowTitles, R.id.rowGlass, R.id.rowNotify, R.id.rowLotteryNotify, R.id.rowLotteryRegions, R.id.rowKeywords, R.id.rowSources, R.id.rowAbout, R.id.rowTheme, R.id.rowBgPlay, R.id.rowPip, R.id.rowAutoplay, R.id.rowAudioOnly, R.id.rowPerms, R.id.rowViewMode, R.id.rowFontSize, R.id.rowBackup, R.id.rowRestore, R.id.rowWidgetAlpha, R.id.rowWidgetCount, R.id.rowWidgetTheme};
+        int[] rows = {R.id.rowTitles, R.id.rowGlass, R.id.rowNotify, R.id.rowLotteryNotify, R.id.rowLotteryRegions, R.id.rowKeywords, R.id.rowSources, R.id.rowAbout, R.id.rowTheme, R.id.rowBgPlay, R.id.rowPip, R.id.rowAutoplay, R.id.rowAudioOnly, R.id.rowPerms, R.id.rowViewMode, R.id.rowFontSize, R.id.rowBackup, R.id.rowRestore, R.id.rowWidgetAlpha, R.id.rowWidgetCount, R.id.rowWidgetTheme, R.id.rowOta, R.id.rowOtaCheck};
         for (int id : rows) {
             View row = findViewById(id);
             if (row == null) continue;
@@ -352,6 +370,9 @@ public class SettingsActivity extends Activity {
         if (txtWidgetAlphaState != null) txtWidgetAlphaState.setText(widgetAlphaName(this));
         if (txtWidgetCountState != null) txtWidgetCountState.setText(NewsWidgetProvider.widgetCount(this) + " tin");
         if (txtWidgetThemeState != null) txtWidgetThemeState.setText(widgetThemeName(this));
+        // Nightly OTA rows.
+        if (txtOtaState != null) txtOtaState.setText(UpdateChecker.otaEnabled(this) ? "Bật — tự hiện changelog khi có bản mới" : "Tắt");
+        if (txtOtaCheckState != null) txtOtaCheckState.setText("Phiên bản hiện tại: " + UpdateChecker.currentVersionName(this) + " — chạm để kiểm tra");
         buildSourcesList();
         if (sourcesListBox != null) sourcesListBox.setVisibility(sourcesExpanded ? View.VISIBLE : View.GONE);
         if (txtSourcesHint != null) txtSourcesHint.setVisibility(sourcesExpanded ? View.VISIBLE : View.GONE);

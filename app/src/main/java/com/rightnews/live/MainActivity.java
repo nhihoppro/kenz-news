@@ -776,6 +776,9 @@ public class MainActivity extends Activity {
         }
         refreshSavedList();
         startTitleTranslation();
+        // Nightly OTA: once per process, show the changelog dialog
+        // when a newer nightly exists (toggle lives in Settings).
+        UpdateChecker.checkOnLaunch(this);
     }
     // v1.11 (suggestion 6): translate what is on screen first.
     // The queue is in list order, so handing it the whole list

@@ -259,6 +259,30 @@
         <TextView android:id="@+id/txtWidgetThemeState" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
     </LinearLayout>
+    <TextView android:id="@+id/grpUpdate" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="CẬP NHẬT"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowOta" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tự động kiểm tra cập nhật" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtOtaState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowOtaCheck" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Kiểm tra cập nhật ngay" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtOtaCheckState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
     <TextView android:id="@+id/grpAbout" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:text="GIỚI THIỆU"
         android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
