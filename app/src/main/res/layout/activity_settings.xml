@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.14: same bar construction as the main header/menu — the root
+     is a FrameLayout, the rows live in a ScrollView that scrolls
+     UNDER the header blur (clipToPadding=false, 72dp top padding:
+     56dp bar + 8dp top margin + 8dp gap), and the bar itself is a
+     fixed 56dp FrameLayout holding a BlurView plus a transparent
+     inner row. Before, the bar was a tint-only strip above a fixed
+     column, so it looked solid instead of glassy like the menu,
+     and long content could clip on small phones. Card padding is
+     8dp now, like every other card in the app (v1.14 compact pass). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsRoot"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient">
+    <ScrollView android:id="@+id/settingsScroll"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="72dp" android:paddingBottom="12dp"
+        android:paddingLeft="12dp" android:paddingRight="12dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView android:id="@+id/grpDisplay" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="HIỂN THỊ"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowTheme" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Chế độ Sáng / Tối" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtThemeState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowGlass" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Hiệu ứng Glass" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtGlassState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<!-- v3.1: compact news view — big card vs compact row (small
+     thumb right, title + 1-line desc). Tapping cycles. -->
+<LinearLayout android:id="@+id/rowViewMode" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Dạng xem tin" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtViewModeState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<!-- v3.1: font size — Nhỏ / Vừa / Lớn. Applies to news and
+     video cards and the article reader's text zoom. -->
+<LinearLayout android:id="@+id/rowFontSize" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Cỡ chữ" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtFontSizeState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <TextView android:id="@+id/grpContent" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="NỘI DUNG"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowTitles" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Dịch tiêu đề sang tiếng Việt" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtTitlesState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowSources" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Nguồn tin" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtSourcesState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<!-- v3.12: Sources live here now (the tab is gone) — the
+     list is built in code from SourceAdapter rows. -->
+<TextView android:id="@+id/txtSourcesHint" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="12sp"
+        android:textColor="#B9C6E0" android:paddingTop="8dp"
+        android:text="Vuốt trái để Sửa hoặc Xoá" />
+<LinearLayout android:id="@+id/sourcesListBox" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:layout_marginTop="8dp" />
+<TextView android:id="@+id/txtSourcesNote" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="12sp"
+        android:textColor="#B9C6E0" android:paddingTop="8dp"
+        android:text="Đã xoá hết nguồn — mở lại app để khôi phục nguồn mặc định."
+        android:visibility="gone" />
+<LinearLayout android:id="@+id/rowBgPlay" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Phát video nền" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtBgPlayState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowPip" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Hình trong hình" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtPipState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowAutoplay" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tự phát video tiếp theo" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtAutoplayState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowAudioOnly" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Chỉ nghe tiếng khi xem video" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtAudioOnlyState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <TextView android:id="@+id/grpNotify" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="THÔNG BÁO"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowNotify" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Thông báo tin mới" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtNotifyState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <!-- v3.8: lottery draw-start notifications (master toggle)
+         + which regions to hear about. -->
+    <LinearLayout android:id="@+id/rowLotteryNotify" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Thông báo bắt đầu quay xổ số" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtLotteryNotifyState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/rowLotteryRegions" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Đài nhận thông báo xổ số" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtLotteryRegionsState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowKeywords" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Từ khóa cần báo" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtKeywordsState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowPerms" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Quyền hệ thống" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtPermsState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <TextView android:id="@+id/grpBackup" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="SAO LƯU"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowBackup" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Sao lưu cài đặt" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtBackupState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowRestore" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Khôi phục cài đặt" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtRestoreState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <TextView android:id="@+id/grpWidget" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="WIDGET"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowWidgetAlpha" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Độ trong suốt của widget" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtWidgetAlphaState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowWidgetCount" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Số tin trên widget" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtWidgetCountState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+<LinearLayout android:id="@+id/rowWidgetTheme" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp" android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Giao diện widget" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:id="@+id/txtWidgetThemeState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    <TextView android:id="@+id/grpAbout" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="GIỚI THIỆU"
+        android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp" />
+<LinearLayout android:id="@+id/rowAbout" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:background="@drawable/glass_card" android:padding="10dp"
+        android:layout_marginTop="8dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:id="@+id/txtAboutTitle" android:text="Kenz News — phiên bản 3.0" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tin Mỹ • Video • Xổ số ba miền"
+            android:textSize="13sp" android:textColor="#374151" />
+    </LinearLayout>
+    </LinearLayout>
+    </ScrollView>
+    <FrameLayout android:id="@+id/settingsBar" android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginLeft="12dp" android:layout_marginRight="12dp"
+        android:layout_marginTop="8dp">
+        <com.rightnews.live.BlurView android:id="@+id/settingsBlur"
+            android:layout_width="match_parent" android:layout_height="match_parent" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:padding="10dp">
+            <TextView android:id="@+id/btnSettingsBack" android:layout_width="wrap_content"
+                android:layout_height="36dp" android:text="‹ Quay lại" android:textSize="13sp"
+                android:background="@android:color/transparent" android:textColor="#FFFFFF"
+                android:gravity="center" android:paddingLeft="12dp" android:paddingRight="12dp"
+                android:clickable="true" android:focusable="true" />
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="Cài đặt"
+                android:id="@+id/txtSettingsTitle"
+                android:textSize="19sp" android:textStyle="bold" android:textColor="#FFFFFF"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

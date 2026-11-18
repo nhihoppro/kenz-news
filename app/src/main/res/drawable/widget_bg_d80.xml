@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.14: widget background, dark mode, 80% navy. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#CC0A1B4A" />
+    <corners android:radius="16dp" />
+</shape>

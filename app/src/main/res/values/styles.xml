@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.42 (T1): dialogs used to follow the SYSTEM's light theme
+     even when the app was dark, because every AlertDialog used
+     the default builder theme and the app has no styles.xml.
+     These two themes mirror the app's own card colours (dark
+     slate + light text, light card + dark text) with the party
+     blue as the button accent; Theme.dialogTheme picks one.
+     v3.13: the window background is now a rounded 20dp card
+     (dialog_bg_*) and the dialog buttons are pills (white pill
+     / navy text in dark mode, navy pill / white text in light
+     mode) — the same look Theme.styleDialog applies in code,
+     so every dialog matches the app even if it is shown
+     without the helper. -->
+<resources>
+    <style name="KenzDialogDark" parent="@android:style/Theme.Material.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_bg_dark</item>
+        <item name="android:textColorPrimary">#FFEAF0FF</item>
+        <item name="android:textColorSecondary">#FFB9C6E0</item>
+        <item name="android:colorAccent">#FF4874A3</item>
+        <item name="android:buttonBarButtonStyle">@style/KenzDialogButtonDark</item>
+    </style>
+    <style name="KenzDialogLight" parent="@android:style/Theme.Material.Light.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_bg_light</item>
+        <item name="android:textColorPrimary">#FF1E293B</item>
+        <item name="android:textColorSecondary">#FF64748B</item>
+        <item name="android:colorAccent">#FF4874A3</item>
+        <item name="android:buttonBarButtonStyle">@style/KenzDialogButtonLight</item>
+    </style>
+    <style name="KenzDialogButtonDark" parent="@android:style/Widget.Material.Button.Borderless">
+        <item name="android:background">@drawable/pill_selected</item>
+        <item name="android:textColor">#FF0A1B4A</item>
+    </style>
+    <style name="KenzDialogButtonLight" parent="@android:style/Widget.Material.Button.Borderless">
+        <item name="android:background">@drawable/pill_navy</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+    </style>
+</resources>

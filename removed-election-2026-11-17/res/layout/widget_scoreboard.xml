@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v2.0 (ý tưởng 3 — widget): scoreboard + top headline.
+     Tap anywhere opens the app's Election tab (the provider
+     writes open_tab=1, the same pref Settings uses for the
+     Sources tab, and MainActivity picks it up in onResume). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetRoot"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="#0A1B4A" android:padding="12dp">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="KENZ ELECTIONS — BẦU CỬ" android:textSize="12sp" android:textStyle="bold"
+        android:textColor="#FFFFFF" />
+    <TextView android:id="@+id/wHouse" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="14sp" android:textColor="#FFFFFF"
+        android:layout_marginTop="6dp" android:text="Hạ viện: chưa có kết quả" />
+    <TextView android:id="@+id/wSenate" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="14sp" android:textColor="#FFFFFF"
+        android:text="Thượng viện: chưa có kết quả" />
+    <TextView android:id="@+id/wGovernor" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="14sp" android:textColor="#FFFFFF"
+        android:text="Thống đốc: chưa có kết quả" />
+    <TextView android:id="@+id/wHeadline" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#DDE6F5"
+        android:layout_marginTop="6dp" android:maxLines="2" android:ellipsize="end"
+        android:text="Chưa có tin mới" />
+    <TextView android:id="@+id/wFoot" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="11sp" android:textColor="#B9C6E0"
+        android:layout_marginTop="4dp" android:text="Chạm để mở tab Bầu cử" />
+</LinearLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.26: one LIVE sticker in the Video tab's compact sticker
+     row. Background + text colours are set in code
+     (styleLiveSticker): unselected = theme card + red LIVE
+     pill, selected (its detail is expanded below the row) =
+     solid red chip + darker pill, so the expanded channel is
+     obvious at a glance. Tapping a sticker toggles its detail;
+     it never opens YouTube by itself. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:paddingLeft="8dp" android:paddingRight="10dp"
+    android:paddingTop="9dp" android:paddingBottom="9dp">
+    <TextView android:id="@+id/txtStickerLive" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="LIVE"
+        android:textSize="11sp" android:textStyle="bold" android:textColor="#FFFFFF"
+        android:paddingLeft="5dp" android:paddingRight="5dp"
+        android:paddingTop="2dp" android:paddingBottom="2dp" android:gravity="center" />
+    <TextView android:id="@+id/txtStickerChannel" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"
+        android:layout_marginLeft="6dp" />
+</LinearLayout>

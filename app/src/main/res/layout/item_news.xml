@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.4: thumbnail rounded 16dp via thumb_round + clipToOutline, so the
+     photo is clipped to the rounded rect instead of a sharp rectangle
+     inside the 28dp card. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="8dp" android:background="@drawable/glass_card">
+    <ImageView android:id="@+id/imgThumb" android:layout_width="match_parent"
+        android:layout_height="160dp" android:scaleType="centerCrop"
+        android:visibility="gone" android:layout_marginBottom="8dp"
+        android:background="@drawable/thumb_round" android:clipToOutline="true" />
+    <TextView android:id="@+id/txtMeta" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#6B7280" />
+    <TextView android:id="@+id/txtTitle" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="17sp" android:textStyle="bold"
+        android:textColor="#111827" android:maxLines="3" />
+    <TextView android:id="@+id/txtDesc" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="14sp" android:textColor="#374151"
+        android:maxLines="2" android:layout_marginTop="4dp" />
+</LinearLayout>

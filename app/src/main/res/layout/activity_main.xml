@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.5 compact: header 36dp chips, title 19sp, tabs 44dp, list bottom
+     padding 12dp (v1.6: bottom menu overlays the news cells by his order),
+     cards 14dp / image 160dp so more news fits on one screen.
+     Tabs: Tin mới / Video / Nguồn. Glass moved to Settings,
+     so the header now holds only title + Settings + Cập nhật. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient">
+    <LinearLayout android:id="@+id/contentRoot"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical" android:padding="12dp">
+        <LinearLayout android:id="@+id/newsBox" android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical"
+            android:paddingTop="104dp">
+            <!-- v3.1: search row (hidden until the header
+                 magnifier is tapped). Filters the news list by
+                 title / description / source, combined with the
+                 selected category; typing ignores Vietnamese
+                 diacritics, so "kinh te" finds "Kinh tế". -->
+            <LinearLayout android:id="@+id/searchBox" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="horizontal"
+                android:gravity="center_vertical" android:background="@drawable/glass_card"
+                android:paddingLeft="12dp" android:paddingRight="4dp"
+                android:paddingTop="2dp" android:paddingBottom="2dp"
+                android:layout_marginBottom="8dp" android:visibility="gone">
+                <EditText android:id="@+id/edtSearch" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="48dp" android:background="@android:color/transparent"
+                    android:hint="Tìm theo tiêu đề, nguồn…" android:textSize="14sp"
+                    android:singleLine="true" android:imeOptions="actionSearch"
+                    android:inputType="text" />
+                <TextView android:id="@+id/txtSearchCount" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textSize="12sp"
+                    android:textColor="#B9C6E0" android:visibility="gone" />
+                <TextView android:id="@+id/btnSearchClear" android:layout_width="48dp"
+                    android:layout_height="48dp" android:text="✕" android:textSize="16sp"
+                    android:gravity="center" android:clickable="true" android:focusable="true"
+                    android:contentDescription="Xoá tìm kiếm" />
+            </LinearLayout>
+            <!-- v3.35: Breaking News — shown only when a feed item
+                 is tagged breaking and fresh (<3h); otherwise GONE,
+                 so the tab looks exactly as before. It sits ABOVE the
+                 category chips (first thing on the tab), stays visible
+                 while scrolling, and the white BREAKING pill + white
+                 blinking dot + 16sp title make it unmissable. Tap
+                 opens the story. -->
+            <LinearLayout android:id="@+id/breakingBar" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="horizontal"
+                android:gravity="center_vertical" android:padding="12dp"
+                android:layout_marginBottom="8dp" android:background="@drawable/breaking_bg"
+                android:visibility="gone" android:clickable="true" android:focusable="true">
+                <ImageView android:id="@+id/breakingDot" android:layout_width="10dp"
+                    android:layout_height="10dp" android:src="@drawable/dot_white" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="BREAKING" android:textSize="12sp" android:textStyle="bold"
+                    android:textColor="#DC2626" android:background="@drawable/breaking_pill"
+                    android:paddingLeft="8dp" android:paddingRight="8dp"
+                    android:paddingTop="3dp" android:paddingBottom="3dp"
+                    android:layout_marginLeft="8dp" />
+                <TextView android:id="@+id/txtBreakingTitle" android:layout_width="0dp"
+                    android:layout_weight="1" android:layout_height="wrap_content"
+                    android:textSize="16sp" android:textStyle="bold" android:textColor="#FFFFFF"
+                    android:maxLines="2" android:layout_marginLeft="8dp" />
+                <TextView android:id="@+id/txtBreakingCount" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textSize="12sp"
+                    android:textColor="#FFFFFF" android:visibility="gone" />
+                <!-- v3.35: dismiss — X at the top-right corner. It is
+                     clickable, so tapping it does NOT open the story
+                     (the banner's own click never fires for this tap).
+                     layout_gravity top pins it to the banner's top
+                     edge, not the vertical centre. -->
+                <TextView android:id="@+id/btnBreakingClose" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="✕" android:textSize="16sp"
+                    android:textStyle="bold" android:textColor="#FFFFFF"
+                    android:layout_gravity="top" android:padding="10dp"
+                    android:clickable="true" android:focusable="true"
+                    android:contentDescription="Ẩn tin nóng" />
+            </LinearLayout>
+            <!-- v3.1: chuyên mục tin tức (hàng chip kéo ngang,
+                 bấm để lọc danh sách theo chuyên mục). -->
+            <HorizontalScrollView android:id="@+id/catScroll" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:scrollbars="none"
+                android:requiresFadingEdge="horizontal" android:fadingEdgeLength="24dp"
+                android:paddingBottom="8dp">
+                <LinearLayout android:id="@+id/catRow" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:orientation="horizontal" />
+            </HorizontalScrollView>
+            <!-- v3.23: GridView, not ListView — 1 column in
+                 portrait, 2 in landscape (see MainActivity
+                 .applyOrientationLayout). Same adapter, same
+                 wiring: GridView is an AbsListView. -->
+            <GridView android:id="@+id/listNews" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:numColumns="1"
+                android:horizontalSpacing="8dp" android:verticalSpacing="8dp"
+                android:stretchMode="columnWidth" android:clipToPadding="false"
+                android:paddingTop="8dp" android:paddingBottom="12dp" />
+        </LinearLayout>
+        <!-- v1.16: the 104dp offset lives on the BOX now, not on
+             the list. Before, txtVideoHead sat at content top,
+             hidden underneath the header overlay (which is why
+             the header blur showed ghost text), while listVideo's
+             own 104dp padding pushed cards far below the head. -->
+        <LinearLayout android:id="@+id/videoBox" android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical"
+            android:paddingTop="104dp"
+            android:visibility="gone">
+            <TextView android:id="@+id/txtVideoHead" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"
+                android:textColor="#EAF0FF" android:paddingTop="10dp" android:paddingBottom="10dp"
+                android:visibility="gone"
+                android:text="Video YouTube" />
+            <!-- v2.0.1: deleted on his order — the "Video
+                 YouTube" and "ĐANG TRỰC TIẾP" headers are
+                 gone; the tab itself already says Video, and
+                 the LIVE pills say the rest. The error note
+                 below stays: it is the only video failure
+                 display (v1.42 C6). -->
+            <TextView android:id="@+id/txtVideoNote" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:textSize="12sp"
+                android:textColor="#B9C6E0" android:paddingBottom="10dp"
+                android:visibility="gone" />
+            <!-- v2.0.1: both headers deleted on his order
+                 (see the note above); the pills row is now
+                 the first visible element of the tab. -->
+            <!-- v1.25: LIVE section, above the video list.
+                 txtLiveHead is coloured in applyTheme like the
+                 other section heads; liveContainer rows are
+                 inflated from item_live.xml in code. -->
+            <TextView android:id="@+id/txtLiveHead" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"
+                android:textColor="#EAF0FF" android:paddingTop="10dp" android:paddingBottom="10dp"
+                android:visibility="gone"
+                android:text="ĐANG TRỰC TIẾP" />
+            <!-- v1.26: compact sticker row (horizontally
+                 scrollable) above the detail area. Collapsed,
+                 the LIVE section is only this one short row, so
+                 the video list below stays visible.
+                 v2.0.1: 12dp bottom margin separates the pills
+                 from the first video card (his order — the card
+                 used to sit jammed against the pills). -->
+            <HorizontalScrollView android:id="@+id/liveStickerScroll" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:scrollbars="none"
+                android:layout_marginBottom="12dp">
+                <LinearLayout android:id="@+id/liveStickerRow" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:orientation="horizontal" />
+            </HorizontalScrollView>
+            <LinearLayout android:id="@+id/liveContainer" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" />
+            <GridView android:id="@+id/listVideo" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:numColumns="1"
+                android:horizontalSpacing="8dp" android:verticalSpacing="8dp"
+                android:stretchMode="columnWidth" android:clipToPadding="false"
+                android:paddingTop="0dp" android:paddingBottom="88dp" />
+        </LinearLayout>
+        <!-- v3.1: tab Đã lưu — stories saved by long-pressing a
+             news or video card. Same card layout as the news
+             list; tap opens it (video items open the player),
+             long-press removes it. -->
+        <LinearLayout android:id="@+id/savedBox" android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical"
+            android:paddingTop="104dp"
+            android:visibility="gone">
+            <TextView android:id="@+id/txtSavedEmpty" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:textSize="13sp"
+                android:textColor="#B9C6E0" android:paddingTop="12dp"
+                android:text="Chưa có tin đã lưu — nhấn giữ một tin ở tab Tin mới hoặc Video để lưu lại đọc sau."
+                android:visibility="gone" />
+            <GridView android:id="@+id/listSaved" android:layout_width="match_parent"
+                android:layout_height="0dp" android:layout_weight="1" android:numColumns="1"
+                android:horizontalSpacing="8dp" android:verticalSpacing="8dp"
+                android:stretchMode="columnWidth" android:clipToPadding="false"
+                android:paddingTop="12dp" android:paddingBottom="88dp" />
+        </LinearLayout>
+        <!-- v3.3: tab Xổ số — kết quả 3 miền từ Minh Ngọc
+             (trực tiếp trong giờ quay + tra ngày khác).
+             Miền Bắc 18h15, Miền Trung 17h15, Miền Nam 16h15. -->
+        <LinearLayout android:id="@+id/lotteryBox" android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical"
+            android:paddingTop="104dp"
+            android:visibility="gone">
+            <LinearLayout android:id="@+id/lotRow" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="horizontal"
+                android:paddingTop="10dp" android:paddingBottom="8dp">
+                <!-- v3.5: chip order Nam - Trung - Bắc. -->
+                <TextView android:id="@+id/lotChipMN" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Miền Nam"
+                    android:textSize="13sp" android:paddingLeft="12dp" android:paddingRight="12dp"
+                    android:paddingTop="11dp" android:paddingBottom="11dp"
+                    android:layout_marginRight="8dp"
+                    android:clickable="true" android:focusable="true" />
+                <TextView android:id="@+id/lotChipMT" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Miền Trung"
+                    android:textSize="13sp" android:paddingLeft="12dp" android:paddingRight="12dp"
+                    android:paddingTop="11dp" android:paddingBottom="11dp"
+                    android:layout_marginRight="8dp"
+                    android:clickable="true" android:focusable="true" />
+                <TextView android:id="@+id/lotChipMB" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Miền Bắc"
+                    android:textSize="13sp" android:paddingLeft="12dp" android:paddingRight="12dp"
+                    android:paddingTop="11dp" android:paddingBottom="11dp"
+                    android:clickable="true" android:focusable="true" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/lotDateRow" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView android:id="@+id/btnLotPrev" android:layout_width="48dp"
+                    android:layout_height="48dp" android:text="‹" android:textSize="22sp"
+                    android:gravity="center" android:clickable="true" android:focusable="true"
+                    android:contentDescription="Ngày trước" />
+                <TextView android:id="@+id/txtLotDate" android:layout_width="0dp"
+                    android:layout_weight="1" android:layout_height="wrap_content"
+                    android:textSize="14sp" android:textStyle="bold" android:gravity="center" />
+                <TextView android:id="@+id/btnLotNext" android:layout_width="48dp"
+                    android:layout_height="48dp" android:text="›" android:textSize="22sp"
+                    android:gravity="center" android:clickable="true" android:focusable="true"
+                    android:contentDescription="Ngày sau" />
+                <ImageView android:id="@+id/btnLotCal" android:layout_width="48dp"
+                    android:layout_height="48dp" android:src="@drawable/ic_calendar"
+                    android:padding="12dp"
+                    android:clickable="true" android:focusable="true"
+                    android:contentDescription="Chọn ngày" />
+            </LinearLayout>
+            <TextView android:id="@+id/txtLotStatus" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:textSize="12sp"
+                android:textColor="#B9C6E0" android:paddingBottom="8dp" />
+            <!-- v3.12: dò vé số — nhập số, đối chiếu với kết
+                 quả đang hiện (đúng đài + đúng ngày). -->
+            <LinearLayout android:id="@+id/lotCheckRow" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="horizontal"
+                android:gravity="center_vertical" android:background="@drawable/glass_card"
+                android:paddingLeft="12dp" android:paddingRight="4dp"
+                android:paddingTop="2dp" android:paddingBottom="2dp"
+                android:layout_marginBottom="8dp">
+                <EditText android:id="@+id/edtLotCheck" android:layout_width="0dp"
+                    android:layout_weight="1" android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Nhập số cần dò, vd: 12345, 67"
+                    android:textSize="14sp" android:singleLine="true"
+                    android:inputType="text" android:imeOptions="actionDone" />
+                <TextView android:id="@+id/btnLotCheck" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Dò" android:textSize="14sp"
+                    android:textStyle="bold" android:gravity="center"
+                    android:paddingLeft="20dp" android:paddingRight="20dp"
+                    android:clickable="true" android:focusable="true" />
+            </LinearLayout>
+            <!-- v3.20: station sub-tabs — one tab per station of the
+                 selected region+date; tapping one shows only that
+                 station's card (built in code by renderLottery). -->
+            <HorizontalScrollView android:id="@+id/lotStationScroll" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:scrollbars="none"
+                android:layout_marginBottom="8dp" android:visibility="gone">
+                <LinearLayout android:id="@+id/lotStationRow" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:orientation="horizontal" />
+            </HorizontalScrollView>
+            <ScrollView android:id="@+id/lotScroll" android:layout_width="match_parent"
+                android:layout_height="0dp" android:layout_weight="1">
+                <LinearLayout android:id="@+id/lotScrollContent" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical">
+                    <!-- v3.24: empty in portrait; in landscape
+                         the fixed rows (chips, date, status, dò,
+                         station tabs) move in here so the whole
+                         tab scrolls as one page (see MainActivity
+                         .layoutLotteryForOrientation). -->
+                    <LinearLayout android:id="@+id/lotControlsBox" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:orientation="vertical" />
+                    <LinearLayout android:id="@+id/lotCards" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:orientation="vertical"
+                        android:paddingBottom="88dp" />
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
+    <!-- v1.10: header bar, same construction as the bottom menu so
+         the two bars are visually identical: a fixed-height
+         FrameLayout holding a BlurView (real blurred snapshot of
+         the content underneath + the menu's own dark/light tint
+         and stroke) with the title + action buttons on top of it.
+         Fixed 56dp height (36dp chips + 10dp padding top/bottom) —
+         NEVER wrap_content with a match_parent BlurView inside,
+         that is the v1.9 blank-screen bug. The header's own
+         LinearLayout has NO background any more: applying a tint
+         drawable on top of it would cover the blur, exactly as
+         with bottomBar. Content below starts under the header
+         (see applyInsets), so nothing is hidden on first open;
+         the blur itself shows the background gradient behind the
+         header, because the header is fixed at the top and no
+         list scrolls behind it the way news scrolls behind the
+         bottom menu — the frosted look, tint and stroke are the
+         same as the menu, which is what makes them read as one
+         system. -->
+    <FrameLayout android:id="@+id/headerBar" android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="top" android:layout_margin="12dp">
+        <com.rightnews.live.BlurView android:id="@+id/topBlur"
+            android:layout_width="match_parent" android:layout_height="match_parent" />
+        <LinearLayout android:id="@+id/topBar" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:orientation="horizontal"
+            android:gravity="center_vertical" android:paddingLeft="10dp" android:paddingRight="10dp"
+            android:paddingTop="4dp" android:paddingBottom="4dp">
+            <TextView android:id="@+id/txtAppTitle" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="Kenz News"
+                android:textSize="19sp" android:textStyle="bold" android:textColor="#FFFFFF" />
+            <!-- v3.1: search icon (48dp touch target, icon stays
+                 centred inside). Opens the search row above the
+                 category chips. -->
+            <ImageView android:id="@+id/btnSearch" android:layout_width="48dp"
+                android:layout_height="48dp" android:src="@drawable/ic_search"
+                android:scaleType="centerInside" android:contentDescription="Tìm tin"
+                android:clickable="true" android:focusable="true" />
+            <ImageView android:id="@+id/btnSettings" android:layout_width="48dp"
+                android:layout_height="48dp" android:src="@drawable/ic_gear"
+                android:scaleType="centerInside" android:contentDescription="Cài đặt"
+                android:clickable="true" android:focusable="true" />
+            <ImageView android:id="@+id/btnRefresh" android:layout_width="48dp"
+                android:layout_height="48dp" android:src="@drawable/ic_refresh"
+                android:scaleType="centerInside" android:contentDescription="Cập nhật"
+                android:layout_marginLeft="8dp"
+                android:clickable="true" android:focusable="true" />
+        </LinearLayout>
+    </FrameLayout>
+    <!-- v1.12: status strip, moved out of contentRoot. It sits
+         below the header (top margin set in applyInsets) and
+         above the lists, with a solid pill background set in
+         applyTheme (black in dark mode, white in light mode) so
+         the text stays readable when cards scroll underneath it.
+         It is a root child, not a content child, so it never
+         scrolls away and never gets clipped by a list. -->
+    <TextView android:id="@+id/txtStatus" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_gravity="top"
+        android:text="Đang tải tin…" android:textSize="12sp" android:textColor="#DDE6F5"
+        android:paddingLeft="12dp" android:paddingRight="12dp"
+        android:paddingTop="6dp" android:paddingBottom="6dp" />
+    <!-- v1.7: bottom menu is a FrameLayout: BlurView draws the blurred
+         news strip underneath (see BlurView), tabs sit on top of it.
+         The old LinearLayout bottomBar is gone; MainActivity must not
+         call GlassUi.applyBar on this view or it would cover the blur.
+         v1.9 FIX for the blank-screen bug in the user's 23:13
+         screenshot (tabs at the top, news hidden): bottomBar used to
+         be wrap_content with a match_parent BlurView inside it, and
+         a FrameLayout measures a match_parent child at full
+         available height, so the whole menu expanded to full
+         screen, covered contentRoot, and left tabsRow at its top.
+         The bar height is therefore FIXED at 52dp (44dp tabs +
+         4dp padding top/bottom) so BlurView can safely stay
+         match_parent inside a fixed-height parent. Never put a
+         match_parent child in a wrap_content FrameLayout again. -->
+    <!-- v3.1: bar is 64dp now (was 52dp) — the tabs carry an
+         icon above the label (20dp icon + 13sp text), so each
+         tab is 56dp tall. Icons tint with the tab text colour
+         in setTab. -->
+    <FrameLayout android:id="@+id/bottomBar" android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom" android:layout_margin="8dp">
+        <com.rightnews.live.BlurView android:id="@+id/bottomBlur"
+            android:layout_width="match_parent" android:layout_height="match_parent" />
+        <LinearLayout android:id="@+id/tabsRow" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="horizontal"
+            android:padding="4dp">
+        <TextView android:id="@+id/tabNews" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="56dp" android:text="Tin mới"
+            android:textSize="13sp" android:drawableTop="@drawable/ic_tab_news"
+            android:drawablePadding="2dp"
+            android:gravity="center" android:clickable="true" android:focusable="true" />
+        <TextView android:id="@+id/tabVideo" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="56dp" android:text="Video"
+            android:textSize="13sp" android:drawableTop="@drawable/ic_tab_video"
+            android:drawablePadding="2dp"
+            android:gravity="center" android:clickable="true" android:focusable="true" />
+        <TextView android:id="@+id/tabLottery" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="56dp" android:text="Xổ số"
+            android:textSize="13sp" android:drawableTop="@drawable/ic_tab_lottery"
+            android:drawablePadding="2dp"
+            android:gravity="center" android:clickable="true" android:focusable="true" />
+        <TextView android:id="@+id/tabSaved" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="56dp" android:text="Đã lưu"
+            android:textSize="13sp" android:drawableTop="@drawable/ic_tab_saved"
+            android:drawablePadding="2dp"
+            android:gravity="center" android:clickable="true" android:focusable="true" />
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

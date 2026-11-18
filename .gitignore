@@ -1,0 +1,11 @@
+# Build outputs (the manual build writes outside the project, but be safe)
+build/
+out/
+*.apk
+*.aab
+*.dex
+*.class
+local.properties
+.idea/
+*.iml
+.DS_Store

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.20: name-only source row with swipe-to-reveal actions. The row
+     is a FrameLayout: behind the name card sit Edit and Delete
+     buttons, right-aligned, as ImageViews with custom vector
+     icons (ic_edit / ic_delete, drawn for this app — no emoji
+     text any more, so the icons are crisp white shapes on the
+     blue / red buttons at every density). Swiping the card left
+     slides it aside to reveal them (see SourceAdapter's touch
+     handling, which also fades the buttons in). Only the name
+     shows now (with ● enabled / ○ disabled). Tapping the card
+     toggles the source. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="horizontal" android:gravity="right|center_vertical">
+        <ImageView android:id="@+id/btnSourceEdit" android:layout_width="72dp"
+            android:layout_height="match_parent" android:src="@drawable/ic_edit"
+            android:scaleType="centerInside" android:background="#2563EB"
+            android:contentDescription="Sửa" android:clickable="true" android:focusable="true" />
+        <ImageView android:id="@+id/btnSourceDelete" android:layout_width="72dp"
+            android:layout_height="match_parent" android:src="@drawable/ic_delete"
+            android:scaleType="centerInside" android:background="#DC2626"
+            android:contentDescription="Xoá" android:clickable="true" android:focusable="true" />
+    </LinearLayout>
+    <!-- v3.1: a real Switch on the right of the card, so
+         bật/tắt is visible and tappable at a glance (the old
+         ●/○ dot + tap-to-toggle was invisible to new users).
+         The card's swipe/tap touch listener still owns taps
+         that start outside the Switch; the Switch consumes
+         its own taps (see SourceAdapter). -->
+    <LinearLayout android:id="@+id/srcCard" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/glass_card" android:paddingTop="8dp" android:paddingBottom="8dp" android:paddingLeft="16dp" android:paddingRight="8dp">
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:orientation="vertical">
+        <TextView android:id="@+id/txtSourceName" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#111827" android:maxLines="1" android:ellipsize="end" />
+        <!-- v2.0.2: state line under the name, mirroring the
+             Settings rows (title + state) so the tab reads
+             like the rest of the app instead of name-only. -->
+        <TextView android:id="@+id/txtSourceState" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#374151"
+            android:layout_marginTop="2dp" android:maxLines="1" android:ellipsize="end" />
+        </LinearLayout>
+        <Switch android:id="@+id/swSource" android:layout_width="wrap_content"
+            android:layout_height="48dp" android:layout_marginLeft="8dp"
+            android:contentDescription="Bật hoặc tắt nguồn này" />
+    </LinearLayout>
+</FrameLayout>

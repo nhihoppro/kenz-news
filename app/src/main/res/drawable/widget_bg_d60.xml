@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.14: widget background, dark mode, 60% navy — the glass
+     look: the wallpaper shows through like the app's bars. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#990A1B4A" />
+    <corners android:radius="16dp" />
+</shape>

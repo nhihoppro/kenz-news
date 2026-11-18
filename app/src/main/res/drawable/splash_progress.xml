@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.11: US-flag progress bar for the splash page.
+     Track = light rounded capsule; fill = the flag (flag_progress.png,
+     drawn with the app's navy #002865 canton + red #DC2626 stripes),
+     revealed left-to-right by a ClipDrawable as progress grows. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
+            <solid android:color="#CBD5E1" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip android:drawable="@drawable/flag_progress"
+            android:clipOrientation="horizontal" android:gravity="left" />
+    </item>
+</layer-list>

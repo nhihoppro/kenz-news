@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.4: navy only, no pink. The old purple->cyan->pink gradient bled
+     through the translucent bars and read as a pink stripe. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:type="linear" android:angle="135"
+        android:startColor="#0A1B4A" android:centerColor="#14337E" android:endColor="#1D4ED8" />
+</shape>

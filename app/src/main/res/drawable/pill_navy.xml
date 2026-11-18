@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.13: navy pill — the light-mode mirror of pill_selected
+     (white pill), for dialog buttons + anywhere a navy pill
+     is needed on a light surface. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#0A1B4A" />
+    <corners android:radius="22dp" />
+</shape>

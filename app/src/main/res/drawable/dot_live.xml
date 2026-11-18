@@ -1,0 +1,7 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <!-- v3.6: the live dot — a solid red disc (same red as
+         LIVE / Giải ĐB). Its alpha is animated 255 <-> 40
+         by MainActivity so it blinks while a region draws. -->
+    <solid android:color="#DC2626" />
+    <size android:width="10dp" android:height="10dp" />
+</shape>

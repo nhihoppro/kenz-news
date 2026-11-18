@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.30: the app's own notification icon — a white K on
+     transparent, the format notification small icons need
+     (the system renders the alpha, tinted). Replaces the
+     generic old Android icons the notifications used before
+     (ic_dialog_info for news, ic_media_play for playback),
+     which is what the user saw on the shade and reported
+     as "icon cũ". -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M4,3h4v18h-4zM6,12L20,3v4L11,12l9,5v4z" />
+</vector>

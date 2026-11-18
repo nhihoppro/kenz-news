@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.23: custom refresh icon, drawn for this app (not an emoji or
+     a system icon). A circular arrow, clockwise: a thick 270° ring
+     (outer 8.5, inner 5.5, centre 12,12, gap at the top-left) with
+     an arrowhead at the top pointing right (the clockwise tangent
+     there), tip at (19,5) protruding 1.4dp past the outer circle so
+     the point reads as a point, not as part of the ring. White
+     fill; the header tints it (white in dark mode, navy in light
+     mode) via setColorFilter, so it stays visible on both header
+     backgrounds. Same 24x24 / white-fill language as ic_edit and
+     ic_delete. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M 12,3.5 A 8.5,8.5 0 1 1 3.5,12 L 6.5,12 A 5.5,5.5 0 1 0 12,6.5 Z M 12,3.5 L 12,6.5 L 19,5 Z" />
+</vector>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.12: home-screen widget — 4 newest headlines from the
+     news cache. No periodic update (updatePeriodMillis=0);
+     MainActivity / SplashActivity / NewsJobService repaint it
+     every time they save fresh cache. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="170dp"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_news"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

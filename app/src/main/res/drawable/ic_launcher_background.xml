@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.10: solid navy backing (#002865, sampled from the
+     logo) — the old transparent background let the
+     wallpaper show through the launcher mask's corners,
+     and the artwork had no safe-zone margin so the mask
+     cut the star and the red bar. The foreground artwork
+     is now inset to the 66% safe zone, so the mask only
+     ever crops navy. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#002865" />
+</shape>

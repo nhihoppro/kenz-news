@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3.13: redesigned to match the app — red ticker dot +
+     KENZ NEWS header, a hairline divider, then 4 headlines
+     each with its own red dot, on the same card the app uses
+     (navy in dark mode, white in light mode; colours are set
+     in NewsWidgetProvider.buildViews so the widget follows
+     the app theme). Tapping anywhere opens the app. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetRoot"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@drawable/widget_bg"
+    android:padding="12dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+        <ImageView android:layout_width="8dp" android:layout_height="8dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="6dp" />
+        <TextView android:id="@+id/widgetTitle" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text="KENZ NEWS"
+            android:textSize="13sp" android:textStyle="bold" android:textColor="#FFFFFF" />
+        <TextView android:id="@+id/widgetTime" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text=""
+            android:textSize="12sp" android:textColor="#B9C6E0" />
+    </LinearLayout>
+    <View android:id="@+id/widgetDivider" android:layout_width="match_parent"
+        android:layout_height="1dp" android:background="#334155"
+        android:layout_marginTop="8dp" />
+    <LinearLayout android:id="@+id/widgetRow1" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingTop="8dp">
+        <ImageView android:layout_width="6dp" android:layout_height="6dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="8dp" />
+        <TextView android:id="@+id/widgetHead1" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text="Chưa có tin — mở app để tải."
+            android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/widgetRow2" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingTop="6dp">
+        <ImageView android:layout_width="6dp" android:layout_height="6dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="8dp" />
+        <TextView android:id="@+id/widgetHead2" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/widgetRow3" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingTop="6dp">
+        <ImageView android:layout_width="6dp" android:layout_height="6dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="8dp" />
+        <TextView android:id="@+id/widgetHead3" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/widgetRow4" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingTop="6dp">
+        <ImageView android:layout_width="6dp" android:layout_height="6dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="8dp" />
+        <TextView android:id="@+id/widgetHead4" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+    <!-- v3.14: rows 5-6, shown only when the widget count
+         setting is 6 (see NewsWidgetProvider.buildViews). -->
+    <LinearLayout android:id="@+id/widgetRow5" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingTop="6dp" android:visibility="gone">
+        <ImageView android:layout_width="6dp" android:layout_height="6dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="8dp" />
+        <TextView android:id="@+id/widgetHead5" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/widgetRow6" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingTop="6dp" android:visibility="gone">
+        <ImageView android:layout_width="6dp" android:layout_height="6dp"
+            android:src="@drawable/dot_red" android:layout_marginRight="8dp" />
+        <TextView android:id="@+id/widgetHead6" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp" android:textColor="#FFFFFF" android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+</LinearLayout>

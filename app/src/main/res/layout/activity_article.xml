@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.4: same fixes as main — TextViews instead of Buttons, navy
+     background, top padding from real WindowInsets in code. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/articleRoot"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@drawable/bg_gradient">
+    <FrameLayout android:id="@+id/articleBar" android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginLeft="12dp" android:layout_marginRight="12dp"
+        android:layout_marginTop="8dp" android:layout_marginBottom="8dp">
+        <com.rightnews.live.BlurView android:id="@+id/articleBlur"
+            android:layout_width="match_parent" android:layout_height="match_parent" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingLeft="10dp" android:paddingRight="10dp"
+            android:paddingTop="4dp" android:paddingBottom="4dp">
+        <TextView android:id="@+id/btnBack" android:layout_width="wrap_content"
+            android:layout_height="48dp" android:text="‹ Quay lại" android:textSize="13sp"
+            android:background="@android:color/transparent" android:textColor="#FFFFFF"
+            android:gravity="center" android:paddingLeft="12dp" android:paddingRight="12dp"
+            android:clickable="true" android:focusable="true" />
+        <TextView android:id="@+id/txtArticleTitle" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold"
+            android:textColor="#FFFFFF" android:maxLines="1" android:ellipsize="end"
+            android:paddingLeft="10dp" android:paddingRight="10dp" />
+        <TextView android:id="@+id/btnTranslate" android:layout_width="wrap_content"
+            android:layout_height="48dp" android:text="Dịch: VI" android:textSize="12sp"
+            android:background="@android:color/transparent" android:textColor="#FFFFFF"
+            android:gravity="center" android:paddingLeft="12dp" android:paddingRight="12dp"
+            android:clickable="true" android:focusable="true" />
+        <!-- v3.1: "Mở ngoài" and "Báo QC" moved into this ⋮
+             overflow menu — the bar was too crowded on narrow
+             phones and the title got squeezed to a few chars.
+             48dp touch target like the other bar buttons. -->
+        <TextView android:id="@+id/btnMore" android:layout_width="48dp"
+            android:layout_height="48dp" android:text="⋮" android:textSize="20sp"
+            android:background="@android:color/transparent" android:textColor="#FFFFFF"
+            android:gravity="center" android:clickable="true" android:focusable="true"
+            android:contentDescription="Thêm" />
+        </LinearLayout>
+    </FrameLayout>
+    <TextView android:id="@+id/txtTranslated" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#DDE6F5"
+        android:paddingLeft="12dp" android:paddingRight="12dp" android:visibility="gone" />
+    <TextView android:id="@+id/txtArticleStatus" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="Đang tải bài…" android:textSize="13sp"
+        android:textColor="#FFFFFF" android:paddingLeft="12dp" android:paddingRight="12dp" android:paddingBottom="4dp" />
+    <WebView android:id="@+id/webArticle" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" />
+</LinearLayout>

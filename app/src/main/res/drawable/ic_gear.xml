@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.42: gear icon in the same 24x24 white-fill language as
+     ic_refresh (Q3: the header's "gear" character could render
+     as a coloured emoji, unlike the vector refresh icon). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFF" android:fillType="evenOdd"
+        android:pathData="M 18.77,9.54 L 21.51,10.66 L 21.51,13.34 L 18.77,14.46 L 18.53,15.04 L 19.67,17.78 L 17.78,19.67 L 15.04,18.53 L 14.46,18.77 L 13.34,21.51 L 10.66,21.51 L 9.54,18.77 L 8.96,18.53 L 6.22,19.67 L 4.33,17.78 L 5.47,15.04 L 5.23,14.46 L 2.49,13.34 L 2.49,10.66 L 5.23,9.54 L 5.47,8.96 L 4.33,6.22 L 6.22,4.33 L 8.96,5.47 L 9.54,5.23 L 10.66,2.49 L 13.34,2.49 L 14.46,5.23 L 15.04,5.47 L 17.78,4.33 L 19.67,6.22 L 18.53,8.96 Z M 12,8.8 a 3.2,3.2 0 1 0 0.01,0 Z" />
+</vector>

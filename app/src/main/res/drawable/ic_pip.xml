@@ -1,0 +1,7 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- v1.36: picture-in-picture — small window over a big one. -->
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="1.8"
+        android:pathData="M3,5 h18 v14 h-18 z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M13,13 h6 v5 h-6 z" />
+</vector>

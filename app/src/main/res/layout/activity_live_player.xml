@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.27: in-app LIVE player screen. v3.16: it used to be black
+     background always (a video screen) with fixed light texts —
+     but that left it out of sync once the app went light, so the
+     player now follows the app theme (see applyPlayerTheme in
+     LivePlayerActivity: background, status bar, cards, every
+     text colour). The video itself stays black in its 16:9 box.
+     In landscape the info panel
+     is hidden and the player fills the screen (see
+     LivePlayerActivity); in portrait the player is 16:9 on top
+     with the info below. v1.32: a live-chat WebView under the
+     info panel, shown only when the stream actually has live
+     chat (see LivePlayerActivity.hasLiveChat); in landscape it
+     sits beside the player instead. v3.22: the v3.21 back chip
+     is removed (it covered the video); the floating row is
+     landscape-only PiP again, with no back/X button anywhere
+     on the player — system back exits. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/playerRoot" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+    <LinearLayout android:id="@+id/contentLay" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:orientation="vertical">
+    <WebView android:id="@+id/webPlayer" android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout android:id="@+id/infoPanel" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:padding="16dp">
+        <TextView android:id="@+id/txtPlayerChannel" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:id="@+id/txtPlayerTitle" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="14sp" android:maxLines="3"
+            android:layout_marginTop="4dp" />
+        <!-- v1.36: the four actions are icon buttons now, one
+             compact row instead of two text-pill rows. The pill
+             background + tint still come from Theme in code, so
+             the icons follow Sáng/Tối like the text did. -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="12dp">
+            <ImageButton android:id="@+id/btnOpenYoutube" android:layout_width="44dp"
+                android:layout_height="44dp" android:src="@drawable/ic_youtube"
+                android:scaleType="centerInside" android:padding="10dp"
+                android:contentDescription="Mở trong app YouTube" />
+            <ImageButton android:id="@+id/btnToggleChat" android:layout_width="44dp"
+                android:layout_height="44dp" android:src="@drawable/ic_chat"
+                android:scaleType="centerInside" android:padding="10dp"
+                android:layout_marginLeft="10dp" android:visibility="gone"
+                android:contentDescription="Ẩn chat" />
+            <ImageButton android:id="@+id/btnPip" android:layout_width="44dp"
+                android:layout_height="44dp" android:src="@drawable/ic_pip"
+                android:scaleType="centerInside" android:padding="10dp"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="Hình trong hình" />
+            <!-- v3.12: chỉ nghe tiếng — ẩn hình, chỉ phát tiếng. -->
+            <ImageButton android:id="@+id/btnAudioOnly" android:layout_width="44dp"
+                android:layout_height="44dp" android:src="@drawable/ic_audio"
+                android:scaleType="centerInside" android:padding="10dp"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="Chỉ nghe tiếng" />
+        </LinearLayout>
+    </LinearLayout>
+    <WebView android:id="@+id/webChat" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1"
+        android:visibility="gone" />
+    <!-- v1.47: related videos replace the v1.45–v1.46
+         comments section (removed on his order, with the
+         Settings key input). Same slot: non-live videos
+         only, portrait only; live videos keep live chat.
+         Related = the same channel's other videos via its
+         mobile /videos page — YouTube's own up-next list
+         is not in the watch page's initial HTML (verified
+         2026-11-04: 0 compactVideoRenderer on mobile, 0 on
+         desktop), and the key route is gone with the key
+         input, so same-channel is the keyless route. -->
+    <LinearLayout android:id="@+id/relatedSection" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical"
+        android:padding="16dp" android:visibility="gone">
+        <TextView android:id="@+id/txtRelatedHead" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Video liên quan" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:id="@+id/txtRelatedNote" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="13sp"
+            android:layout_marginTop="6dp"
+            android:text="Đang tải video liên quan…" />
+        <ScrollView android:id="@+id/relatedScroll" android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_weight="1" android:visibility="gone">
+            <LinearLayout android:id="@+id/relatedList" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" />
+        </ScrollView>
+    </LinearLayout>
+    </LinearLayout>
+    <!-- v3.22: the back chip is gone (his 14:28 screenshot —
+         it covered the video title). No back/X button on the
+         player at all now: system back is the way out. The
+         floating row is back to landscape-only PiP (v1.42):
+         in landscape the info panel is hidden, so PiP needs
+         this button; in portrait the row stays hidden. -->
+    <LinearLayout android:id="@+id/landscapeBtns" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:orientation="horizontal"
+        android:layout_gravity="top|start" android:layout_margin="8dp"
+        android:visibility="gone">
+        <ImageButton android:id="@+id/btnLandPip" android:layout_width="44dp"
+            android:layout_height="44dp" android:src="@drawable/ic_pip"
+            android:scaleType="centerInside" android:padding="10dp"
+            android:contentDescription="Hình trong hình" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.20: custom delete icon, drawn for Kenz Elections.
+     Trash bin: handle on the lid, lid overhanging the
+     tapered body, rounded bottom corners, white fill so
+     it sits clean on the red button. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M 10,2 L 14,2 L 14,4 L 10,4 Z M 4,4 L 20,4 L 20,6.5 L 4,6.5 Z M 6,8 L 18,8 L 16,19 Q 16,21 14,21 L 10,21 Q 8,21 8,19 L 6,8 Z" />
+</vector>
