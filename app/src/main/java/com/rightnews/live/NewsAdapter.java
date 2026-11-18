@@ -91,6 +91,11 @@ public class NewsAdapter extends BaseAdapter {
         h.title.setTextColor(Theme.bodyText(c));
         h.desc.setTextColor(Theme.subText(c));
         h.meta.setTextColor(Theme.noteText(c));
+        // Nightly: articles already read are dimmed so the user
+        // doesn't re-open them by mistake. Both branches set the
+        // alpha — the row is recycled, so a stale alpha must
+        // never survive a rebind.
+        v.setAlpha(ReadHistory.isRead(c, it.key()) ? 0.55f : 1.0f);
         return v;
     }
 }

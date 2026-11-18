@@ -161,6 +161,34 @@
             android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical"
             android:paddingTop="104dp"
             android:visibility="gone">
+            <!-- Nightly: Đã lưu / Lịch sử đã đọc — one list, two
+                 modes. The toggle is styled in MainActivity. -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingTop="10dp" android:paddingBottom="8dp">
+                <TextView android:id="@+id/btnSavedTab" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Đã lưu"
+                    android:textSize="13sp" android:textStyle="bold"
+                    android:paddingLeft="12dp" android:paddingRight="12dp"
+                    android:paddingTop="11dp" android:paddingBottom="11dp"
+                    android:layout_marginRight="8dp"
+                    android:clickable="true" android:focusable="true" />
+                <TextView android:id="@+id/btnHistoryTab" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Lịch sử đã đọc"
+                    android:textSize="13sp"
+                    android:paddingLeft="12dp" android:paddingRight="12dp"
+                    android:paddingTop="11dp" android:paddingBottom="11dp"
+                    android:layout_marginRight="8dp"
+                    android:clickable="true" android:focusable="true" />
+                <View android:layout_width="0dp" android:layout_weight="1" android:layout_height="1dp" />
+                <TextView android:id="@+id/btnClearHistory" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Xoá lịch sử"
+                    android:textSize="13sp"
+                    android:paddingLeft="12dp" android:paddingRight="12dp"
+                    android:paddingTop="11dp" android:paddingBottom="11dp"
+                    android:visibility="gone"
+                    android:clickable="true" android:focusable="true" />
+            </LinearLayout>
             <TextView android:id="@+id/txtSavedEmpty" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:textSize="13sp"
                 android:textColor="#B9C6E0" android:paddingTop="12dp"
@@ -264,6 +292,16 @@
                          .layoutLotteryForOrientation). -->
                     <LinearLayout android:id="@+id/lotControlsBox" android:layout_width="match_parent"
                         android:layout_height="wrap_content" android:orientation="vertical" />
+                    <!-- Nightly: thống kê 30 ngày (tần suất, lô gan,
+                         đầu-đuôi) — a button here, above the result
+                         cards, so it never gets cleared by
+                         renderLottery and stays put in landscape. -->
+                    <TextView android:id="@+id/btnLotStats" android:layout_width="match_parent"
+                        android:layout_height="48dp" android:text="📊 Thống kê 30 ngày"
+                        android:textSize="14sp" android:textStyle="bold" android:gravity="center"
+                        android:background="@drawable/glass_card"
+                        android:layout_marginBottom="8dp"
+                        android:clickable="true" android:focusable="true" />
                     <LinearLayout android:id="@+id/lotCards" android:layout_width="match_parent"
                         android:layout_height="wrap_content" android:orientation="vertical"
                         android:paddingBottom="88dp" />

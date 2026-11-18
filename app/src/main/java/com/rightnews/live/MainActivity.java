@@ -34,6 +34,8 @@ public class MainActivity extends Activity {
     private List<NewsItem> all = new ArrayList<>();
     private List<Source> sources;
     private NewsAdapter newsAdapter, videoAdapter, savedAdapter;
+    // Nightly: Saved tab mode — 0 = Đã lưu, 1 = Lịch sử đã đọc.
+    private int savedMode = 0;
     private List<NewsItem> videoNews = new ArrayList<>();
     // v1.14: the update status line shows, then hides itself after
     // 5s. The hide runnable is cancelled and re-posted on every
@@ -481,11 +483,29 @@ public class MainActivity extends Activity {
         lvSaved.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> a, View v, int p, long id) {
                 NewsItem it = (NewsItem) savedAdapter.getItem(p);
-                NewsStore.toggleSaved(MainActivity.this, it);
-                refreshSavedList();
-                Toast.makeText(MainActivity.this, "Đã bỏ lưu: " + it.title, Toast.LENGTH_SHORT).show();
+                if (savedMode == 1) {
+                    // Nightly: in history mode, long-press removes
+                    // that one article from the history.
+                    ReadHistory.remove(MainActivity.this, it.key());
+                    refreshSavedList();
+                    Toast.makeText(MainActivity.this, "Đã xoá khỏi lịch sử: " + it.title, Toast.LENGTH_SHORT).show();
+                } else {
+                    NewsStore.toggleSaved(MainActivity.this, it);
+                    refreshSavedList();
+                    Toast.makeText(MainActivity.this, "Đã bỏ lưu: " + it.title, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
+        });
+        // Nightly: Saved / History toggle.
+        findViewById(R.id.btnSavedTab).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { savedMode = 0; refreshSavedList(); }
+        });
+        findViewById(R.id.btnHistoryTab).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { savedMode = 1; refreshSavedList(); }
+        });
+        findViewById(R.id.btnClearHistory).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { clearHistoryConfirm(); }
         });
         refreshSavedList();
         setupSearch();
@@ -1176,6 +1196,9 @@ public class MainActivity extends Activity {
         i.putExtra("title", dispTitle);
         try { startActivity(i); }
         catch (Exception e) { Toast.makeText(this, "Không mở được bài", Toast.LENGTH_SHORT).show(); }
+        // Nightly: opening an article marks it read (dims it in
+        // the list and adds it to the reading history).
+        if (current != null) ReadHistory.markRead(this, current);
     }
     // v1.16: open a video straight in the YouTube app when it
     // is installed (vnd.youtube deep link, no in-app player any
@@ -1361,11 +1384,56 @@ public class MainActivity extends Activity {
     // channelId, so opening one goes back to the player.
     private void refreshSavedList() {
         if (savedAdapter == null) return;
-        List<NewsItem> saved = NewsStore.loadSaved(this);
-        savedAdapter.setItems(saved);
+        // Nightly: the Saved tab now has two modes — Đã lưu and
+        // Lịch sử đã đọc. The toggle is styled like the lottery
+        // region chips (selected = pill + bold).
+        View btnSaved = findViewById(R.id.btnSavedTab);
+        View btnHist = findViewById(R.id.btnHistoryTab);
+        View btnClear = findViewById(R.id.btnClearHistory);
+        if (btnSaved != null) styleSavedTab((TextView) btnSaved, savedMode == 0);
+        if (btnHist != null) styleSavedTab((TextView) btnHist, savedMode == 1);
+        List<NewsItem> items;
+        String emptyText;
+        if (savedMode == 1) {
+            items = ReadHistory.loadHistory(this);
+            emptyText = "Chưa đọc bài nào — mở một bài ở tab Tin mới, bài đó sẽ hiện ở đây.";
+            if (btnClear != null) btnClear.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        } else {
+            items = NewsStore.loadSaved(this);
+            emptyText = "Chưa có tin đã lưu — nhấn giữ một tin ở tab Tin mới hoặc Video để lưu lại đọc sau.";
+            if (btnClear != null) btnClear.setVisibility(View.GONE);
+        }
+        savedAdapter.setItems(items);
         View empty = findViewById(R.id.txtSavedEmpty);
-        if (empty != null) empty.setVisibility(saved.isEmpty() ? View.VISIBLE : View.GONE);
+        if (empty != null) {
+            ((TextView) empty).setText(emptyText);
+            empty.setVisibility(items.isEmpty() ? View.VISIBLE : View.GONE);
+        }
         if (tab == 3) applyTabStatus();
+    }
+
+    private void styleSavedTab(TextView tv, boolean selected) {
+        if (selected) { tv.setBackground(Theme.pillDrawable(this)); tv.setTextColor(Theme.pillText(this)); }
+        else { tv.setBackgroundColor(0x00000000); tv.setTextColor(Theme.tabUnselected(this)); }
+        tv.setTypeface(null, selected ? Typeface.BOLD : Typeface.NORMAL);
+    }
+
+    // Nightly: clear the whole reading history (with confirm —
+    // it also undims the read articles in the news list).
+    private void clearHistoryConfirm() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Xoá lịch sử đã đọc?")
+                .setMessage("Toàn bộ lịch sử đã đọc sẽ bị xoá, và các bài đã đọc sẽ hiện lại bình thường (không mờ nữa).")
+                .setPositiveButton("Xoá", new android.content.DialogInterface.OnClickListener() {
+                    public void onClick(android.content.DialogInterface d, int which) {
+                        ReadHistory.clearHistory(MainActivity.this);
+                        refreshSavedList();
+                        if (newsAdapter != null) newsAdapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, "Đã xoá lịch sử đã đọc", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Huỷ", null)
+                .show();
     }
     private void saveItem(NewsItem it) {
         if (it == null) return;
@@ -1419,9 +1487,101 @@ public class MainActivity extends Activity {
         if (btnCheck != null) btnCheck.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { checkLotteryNumbers(); }
         });
+        // Nightly: thống kê 30 ngày (tần suất, lô gan, đầu-đuôi).
+        View btnStats = findViewById(R.id.btnLotStats);
+        if (btnStats != null) btnStats.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { showLotteryStats(); }
+        });
         styleLotteryChips();
         updateLotteryDateLabel();
     }
+
+    // Nightly: thống kê xổ số 30 ngày cho miền đang chọn —
+    // số về nhiều nhất, số lâu chưa về (lô gan), đầu/đuôi về
+    // nhiều nhất. The fetch runs off the UI thread; the dialog
+    // shows a loading state until the numbers land.
+    private void showLotteryStats() {
+        final android.app.AlertDialog progress = new android.app.AlertDialog.Builder(this)
+                .setTitle("Thống kê 30 ngày")
+                .setMessage("Đang tải kết quả 30 ngày của " + LotteryFetcher.REGION_NAMES[lotteryRegion] + "…")
+                .setCancelable(false)
+                .create();
+        progress.show();
+        final int region = lotteryRegion;
+        LotteryStats.compute(region, 30, new LotteryStats.Cb() {
+            public void onDone(final LotteryStats.Result r) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        try { progress.dismiss(); } catch (Exception ignored) {}
+                        if (r == null || r.daysCounted == 0) {
+                            Toast.makeText(MainActivity.this, "Không tải được kết quả để thống kê — kiểm tra mạng rồi thử lại.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        TextView tv = new TextView(MainActivity.this);
+                        tv.setText(buildLotteryStatsText(r));
+                        tv.setTextSize(14);
+                        tv.setTextColor(Theme.bodyText(MainActivity.this));
+                        tv.setPadding(24, 16, 24, 16);
+                        android.widget.ScrollView sv = new android.widget.ScrollView(MainActivity.this);
+                        sv.addView(tv);
+                        new android.app.AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Thống kê 30 ngày — " + LotteryFetcher.REGION_NAMES[region])
+                                .setView(sv)
+                                .setPositiveButton("Đóng", null)
+                                .show();
+                    }
+                });
+            }
+        });
+    }
+
+    private String buildLotteryStatsText(LotteryStats.Result r) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(r.daysCounted).append(" kỳ có kết quả trong 30 ngày gần nhất.\n");
+        // Most frequent 2-digit endings, top 10.
+        List<Map.Entry<String, Integer>> freq = new ArrayList<>(r.freq.entrySet());
+        Collections.sort(freq, new Comparator<Map.Entry<String, Integer>>() {
+            public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
+                int d = b.getValue() - a.getValue();
+                return d != 0 ? d : a.getKey().compareTo(b.getKey());
+            }
+        });
+        sb.append("\nVề nhiều nhất:\n");
+        for (int i = 0; i < Math.min(10, freq.size()); i++)
+            sb.append(freq.get(i).getKey()).append(" — ").append(freq.get(i).getValue()).append(" lần\n");
+        // Longest absent ("lô gan"), top 10.
+        List<Map.Entry<String, Integer>> gan = new ArrayList<>(r.lastSeenDaysAgo.entrySet());
+        Collections.sort(gan, new Comparator<Map.Entry<String, Integer>>() {
+            public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
+                int d = b.getValue() - a.getValue();
+                return d != 0 ? d : a.getKey().compareTo(b.getKey());
+            }
+        });
+        sb.append("\nLâu chưa về (lô gan):\n");
+        for (int i = 0; i < Math.min(10, gan.size()); i++) {
+            int d = gan.get(i).getValue();
+            sb.append(gan.get(i).getKey()).append(" — ");
+            sb.append(d >= r.daysRequested ? "chưa về trong 30 ngày" : d + (d == 1 ? " ngày" : " ngày"));
+            sb.append("\n");
+        }
+        // Head / tail frequency, top 5 each.
+        sb.append("\nĐầu về nhiều nhất:\n");
+        appendTopDigits(sb, r.headFreq, 5);
+        sb.append("\nĐuôi về nhiều nhất:\n");
+        appendTopDigits(sb, r.tailFreq, 5);
+        return sb.toString();
+    }
+
+    private void appendTopDigits(StringBuilder sb, int[] counts, int top) {
+        List<Integer> idx = new ArrayList<>();
+        for (int i = 0; i < counts.length; i++) idx.add(i);
+        Collections.sort(idx, new Comparator<Integer>() {
+            public int compare(Integer a, Integer b) { return counts[b] - counts[a]; }
+        });
+        for (int i = 0; i < Math.min(top, idx.size()); i++)
+            sb.append(idx.get(i)).append(" — ").append(counts[idx.get(i)]).append(" lần\n");
+    }
+
     private Calendar midnightToday() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 0); c.set(Calendar.MINUTE, 0);

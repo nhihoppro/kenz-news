@@ -13,6 +13,11 @@ public class ArticleActivity extends Activity {
     private int lastWebScrollY = 0;
     private String originalUrl, title;
     private boolean translated = false;
+    // Nightly: "Nghe bài báo" — the phone's free TTS reads the
+    // article aloud (Vietnamese when translated, English for
+    // the original). Stops when the article is left.
+    private ArticleSpeaker speaker;
+    private boolean speaking = false;
     // v1.11 (suggestion 7): third-party hosts seen while this
     // page loaded, for the "Báo QC" report. Collected on the
     // WebView thread, so a synchronized set; the report button
@@ -144,15 +149,22 @@ public class ArticleActivity extends Activity {
         // v3.1: "Mở ngoài" + "Báo QC" live in the ⋮ overflow
         // menu now (the bar was too crowded for both as
         // permanent buttons). The two actions are unchanged.
+        // Nightly: "Nghe bài báo" joins the same menu.
         findViewById(R.id.btnMore).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 android.widget.PopupMenu menu = new android.widget.PopupMenu(ArticleActivity.this, v);
                 menu.getMenu().add(0, 1, 0, "Mở trong trình duyệt");
                 menu.getMenu().add(0, 2, 0, "Báo QC");
+                menu.getMenu().add(0, 3, 0, speaking ? "Dừng đọc" : "Nghe bài báo");
                 menu.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(android.view.MenuItem item) {
                         if (item.getItemId() == 1) { openExternally(); return true; }
                         if (item.getItemId() == 2) { reportAds(); return true; }
+                        if (item.getItemId() == 3) {
+                            if (speaking) stopListening();
+                            else startListening();
+                            return true;
+                        }
                         return false;
                     }
                 });
@@ -186,6 +198,97 @@ public class ArticleActivity extends Activity {
         }
         if (originalUrl != null) web.loadUrl(originalUrl);
         else finish();
+    }
+    // Nightly: "Nghe bài báo". Extract the article text from
+    // the page (the <article> element when the site has one,
+    // else the whole body), then read it with the phone's free
+    // TTS. The voice follows the page language: Vietnamese
+    // when the article is translated, English for the original.
+    private void startListening() {
+        if (web == null) return;
+        ((TextView) findViewById(R.id.txtArticleStatus)).setText("Đang lấy chữ của bài…");
+        findViewById(R.id.txtArticleStatus).setVisibility(View.VISIBLE);
+        web.evaluateJavascript("(function(){var a=document.querySelector('article')||document.querySelector('[role=main]');var t=a?a.innerText:document.body.innerText;return t||'';})()",
+                new ValueCallback<String>() {
+                    public void onReceiveValue(String v) {
+                        String text = cleanArticleText(decodeJsString(v));
+                        if (title != null && !title.isEmpty()) text = title + ". " + text;
+                        if (text.trim().isEmpty()) {
+                            ((TextView) findViewById(R.id.txtArticleStatus)).setText("Không trích được chữ của bài này để đọc.");
+                            return;
+                        }
+                        if (speaker == null) speaker = new ArticleSpeaker(ArticleActivity.this, new ArticleSpeaker.Listener() {
+                            public void onStatus(String s) {
+                                ((TextView) findViewById(R.id.txtArticleStatus)).setText(s);
+                                findViewById(R.id.txtArticleStatus).setVisibility(View.VISIBLE);
+                            }
+                            public void onDone() {
+                                speaking = false;
+                                ((TextView) findViewById(R.id.txtArticleStatus)).setText("Đã đọc xong.");
+                            }
+                            public void onError(final String msg, final boolean voiceMissing) {
+                                speaking = false;
+                                ((TextView) findViewById(R.id.txtArticleStatus)).setText(msg);
+                                if (voiceMissing) {
+                                    new android.app.AlertDialog.Builder(ArticleActivity.this)
+                                            .setTitle("Chưa có giọng đọc")
+                                            .setMessage(msg + "\n\nMở Cài đặt giọng nói của máy để tải giọng tiếng Việt (miễn phí) rồi nghe lại.")
+                                            .setPositiveButton("Mở cài đặt", new android.content.DialogInterface.OnClickListener() {
+                                                public void onClick(android.content.DialogInterface d, int which) { ArticleSpeaker.openTtsSettings(ArticleActivity.this); }
+                                            })
+                                            .setNegativeButton("Để sau", null)
+                                            .show();
+                                } else {
+                                    Toast.makeText(ArticleActivity.this, msg, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                        speaking = true;
+                        speaker.speak(text, translated);
+                    }
+                });
+    }
+
+    private void stopListening() {
+        speaking = false;
+        if (speaker != null) speaker.stop();
+        ((TextView) findViewById(R.id.txtArticleStatus)).setText("Đã dừng đọc.");
+    }
+
+    // evaluateJavascript returns a JSON-encoded string; decode
+    // it back to plain text (empty when the page gave nothing).
+    private static String decodeJsString(String v) {
+        if (v == null || v.equals("null") || v.isEmpty()) return "";
+        try {
+            Object o = new org.json.JSONTokener(v).nextValue();
+            return o instanceof String ? (String) o : "";
+        } catch (Exception e) {
+            if (v.length() >= 2 && v.startsWith("\"") && v.endsWith("\""))
+                return v.substring(1, v.length() - 1).replace("\\\"", "\"").replace("\\n", "\n");
+            return v;
+        }
+    }
+
+    // Collapse the extracted text to readable paragraphs and
+    // cap it (very long pages would otherwise queue forever).
+    private static String cleanArticleText(String text) {
+        if (text == null) return "";
+        String t = text.replaceAll("[ \\t\\u00a0]+", " ").replaceAll("\\n\\s*\\n+", "\n\n").trim();
+        if (t.length() > 20000) t = t.substring(0, 20000);
+        return t;
+    }
+
+    @Override protected void onPause() {
+        super.onPause();
+        // Nightly: stop reading when the article is left (Home,
+        // Back, a call) — it never talks over anything else.
+        if (speaking) stopListening();
+    }
+
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        if (speaker != null) speaker.release();
+        speaker = null;
     }
     // v1.14: prefer Chrome itself when installed, so its
     // built-in Translate is one tap away on the page;
