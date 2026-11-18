@@ -79,11 +79,23 @@ public class Theme {
                 d.getButton(android.app.AlertDialog.BUTTON_NEGATIVE),
                 d.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)};
             int pad = (int) (12 * c.getResources().getDisplayMetrics().density);
+            // v3.36: give the pill buttons breathing room — the
+            // button bar packs them nearly touching, so each
+            // button gets a 6dp side margin (12dp between two
+            // buttons, 6dp to the dialog edge).
+            int gap = (int) (6 * c.getResources().getDisplayMetrics().density);
             for (android.widget.Button b : btns) {
                 if (b == null) continue;
                 b.setBackground(pillDrawable(c));
                 b.setTextColor(pillText(c));
                 b.setPadding(pad, pad / 2, pad, pad / 2);
+                android.view.ViewGroup.LayoutParams p = b.getLayoutParams();
+                if (p instanceof android.view.ViewGroup.MarginLayoutParams) {
+                    android.view.ViewGroup.MarginLayoutParams mp = (android.view.ViewGroup.MarginLayoutParams) p;
+                    mp.leftMargin = gap;
+                    mp.rightMargin = gap;
+                    b.setLayoutParams(mp);
+                }
             }
         } catch (Exception ignored) {}
     }

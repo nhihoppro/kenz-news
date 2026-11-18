@@ -304,7 +304,7 @@
                          2026-11-18 screenshot. -->
                     <LinearLayout android:id="@+id/btnLotStats" android:layout_width="match_parent"
                         android:layout_height="48dp" android:orientation="horizontal"
-                        android:gravity="center" android:background="@drawable/glass_card"
+                        android:gravity="center"
                         android:layout_marginBottom="8dp"
                         android:clickable="true" android:focusable="true">
                         <ImageView android:id="@+id/imgLotStats" android:layout_width="24dp"

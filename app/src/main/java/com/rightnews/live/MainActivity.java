@@ -996,6 +996,13 @@ public class MainActivity extends Activity {
         // tint the icon and colour the label so both stay readable
         // in dark mode. The row itself centres icon + label as
         // one unit (see the layout note).
+        // v3.36: the button background is theme-aware (the same
+        // card as the result cards) — the old static glass_card
+        // is white at 85% opacity, which renders as a washed-out
+        // light-grey bar in dark mode with near-white text on
+        // top. Do NOT put a static background in the layout.
+        View btnLotStats = findViewById(R.id.btnLotStats);
+        if (btnLotStats != null) btnLotStats.setBackground(GlassUi.cardBg(this, 28f));
         TextView txtLotStats = findViewById(R.id.txtLotStats);
         if (txtLotStats != null) txtLotStats.setTextColor(Theme.bodyText(this));
         ImageView imgLotStats = findViewById(R.id.imgLotStats);
