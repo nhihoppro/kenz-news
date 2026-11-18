@@ -17,7 +17,7 @@ rm -rf "$WORK" && mkdir -p "$WORK/compiled" "$WORK/classes" "$WORK/dex" "$WORK/g
 "$AAPT" link -o "$WORK/base.apk" \
     -I "$PLATFORM" \
     --min-sdk-version 26 --target-sdk-version 35 \
-    --version-code 97 --version-name "0.0.3-nightly" \
+    --version-code 98 --version-name "0.0.3-nightly" \
     --manifest "$SRC/AndroidManifest.xml" \
     --java "$WORK/gen" \
     "$WORK/compiled/res.zip"

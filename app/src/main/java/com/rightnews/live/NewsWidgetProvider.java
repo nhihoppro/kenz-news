@@ -39,6 +39,14 @@ import java.util.*;
 // Luôn sáng.
 public class NewsWidgetProvider extends AppWidgetProvider {
     @Override public void onUpdate(Context c, AppWidgetManager awm, int[] ids) {
+        // v3.36: paint the exact ids the system hands us, not
+        // just the ComponentName — a freshly added widget gets
+        // its RemoteViews on this very call, even if the
+        // ComponentName lookup lags behind.
+        try {
+            RemoteViews rv = buildViews(c);
+            for (int id : ids) awm.updateAppWidget(id, rv);
+        } catch (Exception ignored) {}
         updateAll(c);
     }
     @Override public void onEnabled(Context c) {
@@ -89,7 +97,32 @@ public class NewsWidgetProvider extends AppWidgetProvider {
         if (m == 2) return true;
         return Theme.isLight(c);
     }
+    // v3.36: buildViews must NEVER throw — updateAll() swallows
+    // every exception, so one bad headline used to drop the
+    // whole update and leave the launcher on its white
+    // placeholder + spinner. Now any failure falls back to a
+    // minimal card (title + "open the app" line) instead of
+    // nothing, so the widget always shows content.
     private static RemoteViews buildViews(Context c) {
+        try {
+            return buildViewsInner(c);
+        } catch (Exception e) {
+            try {
+                RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_news);
+                rv.setInt(R.id.widgetRoot, "setBackgroundResource", R.drawable.widget_bg);
+                rv.setTextViewText(R.id.widgetHead1, "Mở app Kenz News để tải tin.");
+                rv.setTextColor(R.id.widgetHead1, 0xFFFFFFFF);
+                Intent it = new Intent(c, MainActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(c, 0, it,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                rv.setOnClickPendingIntent(R.id.widgetRoot, pi);
+                return rv;
+            } catch (Exception ignored) {
+                return new RemoteViews(c.getPackageName(), R.layout.widget_news);
+            }
+        }
+    }
+    private static RemoteViews buildViewsInner(Context c) {
         RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_news);
         // v3.14: glass card — translucency + theme from prefs.
         boolean light = widgetLight(c);

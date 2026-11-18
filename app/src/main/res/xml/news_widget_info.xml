@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- v3.12: home-screen widget — 4 newest headlines from the
-     news cache. No periodic update (updatePeriodMillis=0);
-     MainActivity / SplashActivity / NewsJobService repaint it
-     every time they save fresh cache. -->
+     news cache.
+     v3.36: updatePeriodMillis is now 30 min (the Android
+     minimum) instead of 0. With 0 the widget ONLY repainted
+     when the app itself called updateAll() — if every one of
+     those triggers was missed (fresh install, failed fetch,
+     app update), the launcher stayed on its white placeholder
+     + spinner forever. A 30-min system tick repaints it from
+     the cache on its own, so a stuck widget heals itself. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="250dp"
     android:minHeight="170dp"
-    android:updatePeriodMillis="0"
+    android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_news"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />
